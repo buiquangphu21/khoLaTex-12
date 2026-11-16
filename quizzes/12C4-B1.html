@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>12C4-B1-Nguyên hàm</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; padding: 15px; line-height: 1.6; padding-top: 70px; overflow-x: hidden; background: #fffcf8; }
+        .header-bar { position: fixed; top: 0; left: 0; width: 100%; background: #a56e00; color: white; padding: 10px 15px; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; box-shadow: 0 2px 6px rgba(165,110,0,0.2); }
+        .header-bar h2 { margin: 0; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 65%; }
+        #timer { font-size: 16px; font-weight: bold; background: #e53935; padding: 5px 10px; border-radius: 4px; white-space: nowrap; }
+        
+        .zalo-warning { background: #fdf8ed; color: #724c00; padding: 10px; border: 1px solid #f9e4b8; border-radius: 4px; margin-bottom: 15px; font-weight: bold; text-align: justify; font-size: 14px; }
+        
+        h3 { color: #724c00; border-bottom: 2px solid #f9e4b8; padding-bottom: 5px; margin-top: 30px; text-transform: uppercase; font-size: 18px; }
+        .info-group { margin-bottom: 15px; }
+        .info-group input { width: 100%; padding: 12px; box-sizing: border-box; border: 1px solid #f9e4b8; border-radius: 4px; font-size: 16px; background: #fff; }
+        .info-group input:focus { border-color: #a56e00; outline: none; box-shadow: 0 0 0 3px rgba(165,110,0,0.12); }
+        
+        .question { background: #fdf8ed; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #f9e4b8; box-sizing: border-box; width: 100%; overflow-x: auto; }
+        .question-text { margin-bottom: 15px; word-wrap: break-word; } 
+        
+        mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+        
+        .options label { display: block; padding: 10px; margin: 8px 0; background: #ffffff; border: 1px solid #f9e4b8; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .options label:hover { background: #fbf2df; border-color: #a56e00; }
+        
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 15px 0; }
+        .tf-table { width: 100%; border-collapse: collapse; background: #fff; min-width: 320px; }
+        .tf-table td { padding: 10px; border: 1px solid #f9e4b8; }
+        .tf-radio-group { display: flex; gap: 10px; justify-content: center; }
+        .tf-radio-group label { cursor: pointer; font-weight: bold; padding: 5px; border-radius: 3px; transition: 0.3s; }
+        
+        .short-ans-group { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
+        .short-ans-box { width: 50px; height: 55px; font-size: 24px; text-align: center; border: 2px solid #a56e00; border-radius: 5px; box-sizing: border-box; font-weight: bold; color: #724c00; background: #fff; transition: 0.3s; }
+        .short-ans-box:focus { border-color: #3f2a00; outline: none; box-shadow: 0 0 6px rgba(165,110,0,0.3); }
+        
+        .essay-input { width: 100%; padding: 12px; font-size: 16px; border: 2px solid #f9e4b8; border-radius: 4px; box-sizing: border-box; height: 150px; resize: vertical; background: #fff; }
+        .essay-input:focus { border-color: #a56e00; outline: none; }
+        
+        .solution-box { display: none; margin-top: 15px; padding: 15px; background: #fcf5e6; border-left: 5px solid #0288d1; border-radius: 4px; overflow-x: auto; }
+        
+        button.submit-btn { width: 100%; padding: 15px; background: #a56e00; color: white; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; margin-top: 15px; font-weight: bold; margin-bottom: 5px; }
+        button.submit-btn:hover { background: #724c00; }
+        #result { display: none; margin-top: 20px; padding: 15px; border-radius: 4px; text-align: center; font-weight: bold; font-size: 18px; background: #fdf8ed; color: #3f2a00; border: 1px solid #f9e4b8; margin-bottom: 20px;}
+        
+        #passwordPrompt { display: none; margin-top: 20px; padding: 20px; background: #fdf8ed; border: 1px solid #f9e4b8; border-radius: 5px; text-align: center; margin-bottom: 40px; }
+        #passwordPrompt h4 { color: #724c00; margin-top: 0; margin-bottom: 10px; }
+        #passwordPrompt input { padding: 10px; width: 60%; max-width: 250px; border: 1px solid #f9e4b8; border-radius: 4px; font-size: 16px; }
+        #passwordPrompt button { width: auto; padding: 10px 20px; background: #a56e00; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; margin-left: 10px; }
+        
+        /* --- SVG / ẢNH + KHUNG ZOOM DÙNG CHUNG (khung tự co giãn, không đặt chiều cao cố định) --- */
+        :root {
+            --zoom-accent: #a56e00; --zoom-accent-hover: #724c00;
+            --zoom-border: #f9e4b8; --zoom-bar-bg: #fdf8ed; --zoom-max-h: none;
+        }
+        svg { max-width: 100%; height: auto; display: block; margin: 10px auto; overflow: visible; }
+        svg text { font-family: Arial, sans-serif; }
+        img { max-width: 100%; height: auto; }
+        .zoom-container { display: flex; align-items: flex-start; gap: 10px; margin: 15px 0; }
+        .zoom-viewport {
+            flex: 1 1 auto; min-width: 0;
+            overflow: auto; -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--zoom-border); border-radius: 4px; background: #fff;
+            box-sizing: border-box; padding: 4px;
+        }
+        /* chỉ giới hạn chiều cao và giữ cuộn bên trong khi ảnh đang được phóng to */
+        .zoom-viewport.can-pan { cursor: grab; max-height: var(--zoom-max-h); overscroll-behavior: contain; }
+        .zoom-viewport.dragging { cursor: grabbing; user-select: none; }
+        .zoom-toolbar { display: flex; flex-direction: column; gap: 5px; background: var(--zoom-bar-bg); padding: 5px; border-radius: 4px; border: 1px solid var(--zoom-border); flex-shrink: 0; }
+        .zoom-btn { background: var(--zoom-accent); color: #fff; border: none; padding: 6px 10px; font-size: 14px; border-radius: 4px; cursor: pointer; transition: background .2s, opacity .2s; white-space: nowrap; }
+        .zoom-btn:hover:not(:disabled) { background: var(--zoom-accent-hover); }
+        .zoom-btn:disabled { background: #ccc; cursor: not-allowed; opacity: .6; }
+        .zoom-media { display: block; margin: 0 auto; max-width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+        .zoom-media.zoomed { width: var(--zw) !important; max-width: none !important; height: auto !important; }
+        /* --- BẢNG DÀI: bọc trong khung cuộn ngang, không làm tràn lề --- */
+        .table-scroll { display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin: 10px 0; }
+        .table-scroll > table { margin: 0; max-width: 100%; border-collapse: collapse; }
+        .table-scroll th, .table-scroll td { overflow-wrap: break-word; }
+        /* .table-responsive do TeX2HTML tạo ra: trước đây chỉ mẫu làm bài có CSS này nên bảng rộng bị tràn ở trình chiếu / luyện tập */
+        .table-responsive { display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin: 15px 0; }
+        /* --- BẢNG RỘNG TRÊN ĐIỆN THOẠI: gợi ý vuốt ngang, cột đầu cố định, xem toàn màn hình --- */
+        .tbl-box { position: relative; margin: 12px 0; max-width: 100%; min-width: 0; }
+        .tbl-box > .tbl-wrap { position: relative; }
+        .tbl-box .table-responsive, .tbl-box .table-scroll { margin: 0; }
+        .tbl-hint { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 4px; font-size: 12.5px; color: #5f7b94; }
+        .tbl-box.has-scroll > .tbl-hint { display: flex; }
+        .tbl-open { font: inherit; font-size: 12.5px; padding: 4px 10px; border-radius: 14px; border: 1px solid var(--zoom-border); background: var(--zoom-bar-bg); color: var(--zoom-accent-hover); cursor: pointer; white-space: nowrap; }
+        .tbl-fade { display: none; position: absolute; top: 0; right: 0; bottom: 0; width: 30px; pointer-events: none; background: linear-gradient(to right, rgba(255,255,255,0), rgba(120,140,160,.28)); }
+        .tbl-box.has-scroll:not(.at-end) .tbl-fade { display: block; }
+        .tbl-box.has-scroll table.sticky-first tr > :first-child { position: sticky; left: 0; z-index: 2; background: #fff; box-shadow: 2px 0 4px -2px rgba(0,0,0,.35); }
+        @media (max-width: 600px) {
+            .tbl-box td, .tbl-box th { font-size: 14px; padding: 4px 7px !important; }
+        }
+        #tblOverlay { position: fixed; inset: 0; z-index: 99999; background: #fff; display: none; flex-direction: column; }
+        #tblOverlay.open { display: flex; }
+        .tbl-ov-bar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--zoom-bar-bg); border-bottom: 1px solid var(--zoom-border); }
+        .tbl-ov-bar .ttl { flex: 1; min-width: 0; font-size: 13px; font-weight: bold; color: #333; }
+        .tbl-ov-body { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 10px; touch-action: pan-x pan-y; }
+        .tbl-ov-body table { margin: 0; width: auto; max-width: none; border-collapse: collapse; font-size: calc(15px * var(--tbl-s, 1)); }
+        .tbl-ov-body td, .tbl-ov-body th { font-size: inherit !important; padding: 5px 9px; }
+
+        
+        /* ===== Bổ sung của bộ chuyển đổi TeX2HTML (PyQt6) ===== */
+        .tp { margin: 6px 0; }
+        .center { text-align: center; }
+        /* Huy hiệu mức độ khó (suy ra từ ID câu hỏi, HTML bài giảng) */
+        .lvl { display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 12px; border: 1px solid; font-size: 12px; font-weight: bold; line-height: 1.6; white-space: nowrap; vertical-align: middle; cursor: help; }
+        .lvl .dots { letter-spacing: 1px; margin-right: 4px; }
+        .lvl.lv1 { background: #e6f4ea; border-color: #34a853; color: #1b6b32; }
+        .lvl.lv2 { background: #fbf2df; border-color: #4a90d9; color: #3f2a00; }
+        .lvl.lv3 { background: #fff3e0; border-color: #fb8c00; color: #8a4b00; }
+        .lvl.lv4 { background: #fdeaea; border-color: #e53935; color: #a31515; }
+        .figure svg, .figure img { max-width: 100%; height: auto; }
+        .fig-error { color: #b00020; border: 1px dashed #b00020; padding: 6px 10px; text-align: center; margin: 8px 0; font-size: 14px; }
+        .fbox { border: 1px solid currentColor; padding: 0 4px; }
+        blockquote { margin: 8px 20px; }
+        img { max-width: 100%; height: auto; }
+        ul, ol { margin: 6px 0; padding-left: 24px; }
+        ul.desc, li.cl { list-style: none; }
+        li.cl .lbl { font-weight: bold; margin-right: .4em; }
+        ol[class^="paren-"] { list-style: none; counter-reset: pc; padding-left: 2.2em; }
+        ol[class^="paren-"] > li { counter-increment: pc; position: relative; margin: 4px 0; }
+        ol[class^="paren-"] > li::before { position: absolute; left: -2.2em; width: 2em; text-align: right; font-weight: bold; }
+        ol.paren-a > li::before { content: counter(pc, lower-alpha) ")"; }
+        ol.paren-A > li::before { content: counter(pc, upper-alpha) ")"; }
+        ol.paren-i > li::before { content: counter(pc, lower-roman) ")"; }
+        ol.paren-I > li::before { content: counter(pc, upper-roman) ")"; }
+        ol.paren-1 > li::before { content: counter(pc, decimal) ")"; }
+        table.tex-table { border-collapse: collapse; margin: 8px auto; }
+        table.tex-table td { padding: 4px 10px; }
+        table.tex-table.bordered td { border: 1px solid #555; }
+        .tex-fa { margin: 0 .25em; font-style: normal; }
+
+
+
+        .author-footer { margin: 30px 0 10px; padding-top: 10px; border-top: 1px solid #f9e4b8; text-align: center; color: #5f7b94; font-size: 13px; }
+        .author-footer:empty { display: none; }
+    </style>
+    
+    <script>
+        window.MathJax = {
+          tex: {
+            inlineMath: [['$','$'], ['\\(','\\)']],
+            displayMath: [['$$','$$'], ['\\[','\\]']],
+            processEscapes: true,
+            macros: {"wideparen": ["\\overset{\\frown}{#1}", 1], "overarc": ["\\overset{\\frown}{#1}", 1]}
+          },
+          options: { enableMenu: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"></script>
+</head>
+<body>
+    <div class="header-bar">
+        <h2>12C4-B1-Nguyên hàm</h2>
+        <div id="timer">Đang tải...</div>
+    </div>
+    
+    <div class="zalo-warning" id="zaloWarning">
+        ⚠️ CHÚ Ý: Nếu em đang mở bài này trực tiếp trên Zalo/Messenger, hãy bấm vào biểu tượng "Dấu 3 chấm" ở góc phải màn hình và chọn "Mở bằng trình duyệt" (Chrome/Safari) để không bị lỗi kết nối.
+    </div>
+
+    <div class="info-group">
+        <label>Họ và tên học sinh:</label>
+        <input type="text" id="studentName" placeholder="Nhập họ và tên..." required>
+    </div>
+    <div class="info-group">
+        <label>Lớp:</label>
+        <input type="text" id="studentClass" placeholder="Nhập lớp..." required>
+    </div>
+
+    <hr>
+    <form id="quizForm" onsubmit="return false;">
+        <h3>PHẦN 1. Câu trắc nghiệm nhiều phương án lựa chọn</h3>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 1:</b> Phát biểu nào sau đây là đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_1" value="A"> <b>A.</b> $\displaystyle \int f'(x) \mathrm{d} x = f(x)+C $</label><label><input type="radio" name="P1_Cau_1" value="B"> <b>B.</b> $\displaystyle \int f'(ax+b) \mathrm{d}x = \dfrac{1}{a} \cdot f(x) + C$</label><label><input type="radio" name="P1_Cau_1" value="C"> <b>C.</b> $\displaystyle \int f'(x) \mathrm{d}x=f''(x) + C$</label><label><input type="radio" name="P1_Cau_1" value="D"> <b>D.</b> $\displaystyle \int f'(x) \mathrm{d}x = a \cdot f(ax+b) + C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle \int f'(x) \mathrm{d}x = f(x)+C $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 2:</b> Trong các khẳng định dưới đây, khẳng định nào <b>sai</b>?</div></div><div class="options"><label><input type="radio" name="P1_Cau_2" value="A"> <b>A.</b> $\displaystyle \int \limits {\left[f(x)\cdot g(x)\right]}\mathrm{\,d}x=\displaystyle \int \limits {f(x)\mathrm{\,d}x\cdot \displaystyle \int \limits {g(x)\mathrm{\,d}x}}$</label><label><input type="radio" name="P1_Cau_2" value="B"> <b>B.</b> $\displaystyle \int \limits {\left[f(x)\pm g(x)\right]}\mathrm{\,d}x=\displaystyle \int \limits {f(x)\mathrm{\,d}x\pm \displaystyle \int \limits {g(x)\mathrm{\,d}x}}$</label><label><input type="radio" name="P1_Cau_2" value="C"> <b>C.</b> $\displaystyle \int \limits {f'(x)}\mathrm{\,d}x=f(x)+C$</label><label><input type="radio" name="P1_Cau_2" value="D"> <b>D.</b> $\displaystyle \int \limits {\left[k\cdot f(x)\right]}\mathrm{\,d}x=k\cdot \displaystyle \int \limits {f(x)\mathrm{\,d}x}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Theo tính chất của nguyên hàm, ta suy ra $\displaystyle \int \limits {\left[f(x)\cdot g(x)\right]}\mathrm{\,d}x=\displaystyle \int \limits {f(x)\mathrm{\,d}x\cdot \displaystyle \int \limits {g(x)\mathrm{\,d}x}}$ là khẳng định sai.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 3:</b> Trong các khẳng định sau, khẳng định nào <b>sai</b>?</div></div><div class="options"><label><input type="radio" name="P1_Cau_3" value="A"> <b>A.</b> $ \displaystyle \int \mathrm{\, d}x = x + 2 C $, ($ C $ là hằng số)</label><label><input type="radio" name="P1_Cau_3" value="B"> <b>B.</b> $ \displaystyle \int x^n \mathrm{\, d}x = \dfrac{x^{n+1}}{n+1} + C $, ($ C $ là hằng số; $ n \in \mathbb{Z} $)</label><label><input type="radio" name="P1_Cau_3" value="C"> <b>C.</b> $ \displaystyle \int 0 \mathrm{\, d}x =  C $, ($ C $ là hằng số)</label><label><input type="radio" name="P1_Cau_3" value="D"> <b>D.</b> $ \displaystyle \int \mathrm{e}^x \mathrm{\, d}x = \mathrm{e}^x - C $, ($ C $ là hằng số)</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta thấy $ \displaystyle \int x^x \mathrm{\, d}x = \dfrac{x^{n+1}}{n+1} + C $ sai khi $ n = -1 $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 4:</b> Phát biểu nào sau đây là đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_4" value="A"> <b>A.</b> $\displaystyle\int 0 \mathrm{\,d}x=-x+C$</label><label><input type="radio" name="P1_Cau_4" value="B"> <b>B.</b> $\displaystyle\int 0 \mathrm{\,d}x=x+C$</label><label><input type="radio" name="P1_Cau_4" value="C"> <b>C.</b> $\displaystyle\int 0 \mathrm{\,d}x=Cx,\, C\in \mathbb{R}\setminus \left\lbrace 0\right\rbrace $</label><label><input type="radio" name="P1_Cau_4" value="D"> <b>D.</b> $\displaystyle\int 0 \mathrm{\,d}x=C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int 0\mathrm{\,d}x=0x+C=C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 5:</b> Khẳng định nào trong các khẳng định sau là <b>sai</b>?</div></div><div class="options"><label><input type="radio" name="P1_Cau_5" value="A"> <b>A.</b> $\displaystyle\int kf(x)\mathrm{d}x=k\int f(x)\mathrm{d}x$ với $k\in \mathbb{R}$</label><label><input type="radio" name="P1_Cau_5" value="B"> <b>B.</b> $\displaystyle\int [f(x)+g(x)]\mathrm{d}x=\int{f(x)\mathrm{d}x+\int{g(x)\mathrm{d}x}}$ với $f(x),g(x)$ liên tục trên $\mathbb{R}$</label><label><input type="radio" name="P1_Cau_5" value="C"> <b>C.</b> $\displaystyle\int x^\alpha \mathrm{d}x=\dfrac{1}{\alpha +1}x^{\alpha +1}+C$ với $\alpha \ne -1$</label><label><input type="radio" name="P1_Cau_5" value="D"> <b>D.</b> $\displaystyle\left(\int{f(x)\mathrm{d}x}\right)'=f(x)$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Khẳng định $\displaystyle\int kf(x)\mathrm{d}x=k\int f(x)\mathrm{d}x$ chỉ đúng với $k\neq 0$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 6:</b> Cho $F(x)$ là một nguyên hàm của $f(x)=x\ln x$. Tính $F''(x)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_6" value="A"> <b>A.</b> $F''(x)=1-\ln x$</label><label><input type="radio" name="P1_Cau_6" value="B"> <b>B.</b> $F''(x)= \dfrac{1}{x}$</label><label><input type="radio" name="P1_Cau_6" value="C"> <b>C.</b> $F''(x)=1+\ln x$</label><label><input type="radio" name="P1_Cau_6" value="D"> <b>D.</b> $F''(x)=x+\ln x$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $F'(x)=f(x)$, $F''(x)=f'(x)=1+\ln x$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 7:</b> Cho các hàm số $f(x)=\dfrac{20x^2-30x+7}{\sqrt{2x-3}}$, $F(x)=(ax^2+bx+c)\sqrt{2x-3}$ với $x&gt;\dfrac{3}{2}$. Gọi $(a; b; c)$ là bộ số thỏa mãn $F(x)$ là một nguyên hàm của $f(x)$. Khi đó $a+b+c$ bằng</div></div><div class="options"><label><input type="radio" name="P1_Cau_7" value="A"> <b>A.</b> $1$</label><label><input type="radio" name="P1_Cau_7" value="B"> <b>B.</b> $5$</label><label><input type="radio" name="P1_Cau_7" value="C"> <b>C.</b> $3$</label><label><input type="radio" name="P1_Cau_7" value="D"> <b>D.</b> $7$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có <div class="center"><div class="tp">$\begin{aligned} f(x)&amp;=10x\sqrt{2x-3}+\dfrac{7}{\sqrt{2x-3}}=5(2x-3)\sqrt{2x-3}+15\sqrt{2x-3}+\dfrac{7}{\sqrt{2x-3}}\\
+				&amp;=5(2x-3)^{\tfrac{3}{2}}+15(2x-3)^{\tfrac{1}{2}}+\dfrac{7}{\sqrt{2x-3}}.
+			\end{aligned}$</div></div> Suy ra $\displaystyle\int f(x)\mathrm{\,d}x=(2x-3)^{\tfrac{5}{2}}+5(2x-3)^{\tfrac{3}{2}}+7\sqrt{2x-3}+C=(4x^2-2x+1)\sqrt{2x-3}+C$.<br> Suy ra $F(x)=(4x^2-2x+1)\sqrt{2x-3}$ hay $a=4, b=-2, c=1\Rightarrow a+b+c=3$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 8:</b> Hàm số $F(x)=x^2+\sin x$ là một nguyên hàm của hàm số</div></div><div class="options"><label><input type="radio" name="P1_Cau_8" value="A"> <b>A.</b> $f(x)=\dfrac{1}{3}x^3+\cos x$</label><label><input type="radio" name="P1_Cau_8" value="B"> <b>B.</b> $f(x)=2x+\cos x$</label><label><input type="radio" name="P1_Cau_8" value="C"> <b>C.</b> $f(x)=\dfrac{1}{3}x^3-\cos x$</label><label><input type="radio" name="P1_Cau_8" value="D"> <b>D.</b> $f(x)=2x-\cos x$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F'(x)=2x+\cos x=f(x)$ nên $f(x)=2x+\cos x$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 9:</b> Cho hàm số $ f(x) $ có đạo hàm $ f'(x) $ liên tục và có một nguyên hàm là hàm số $ F(x) $. Tìm nguyên hàm $ I=\displaystyle\int \left[2f(x)+f'(x)+1\right]\mathrm{d}x $.</div></div><div class="options"><label><input type="radio" name="P1_Cau_9" value="A"> <b>A.</b> $ I=2F(x)+f(x)+x+C $</label><label><input type="radio" name="P1_Cau_9" value="B"> <b>B.</b> $ I=2F(x)+xf(x)+C $</label><label><input type="radio" name="P1_Cau_9" value="C"> <b>C.</b> $ I=2xF(x)+f(x)+x+1 $</label><label><input type="radio" name="P1_Cau_9" value="D"> <b>D.</b> $ I=2xF(x)+f(x)+x+C $</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $ I=\displaystyle\int \left[2f(x)+f'(x)+1\right]\mathrm{d}x=2F(x)+f(x)+x+C $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 10:</b> Cho $F(x)$ là một nguyên hàm của hàm số $f(x)=(x+1)\ln x$. Tính $F''(x)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_10" value="A"> <b>A.</b> $F''(x) = 1+\dfrac{1}{x}$</label><label><input type="radio" name="P1_Cau_10" value="B"> <b>B.</b> $F''(x) = \dfrac{1}{x}$</label><label><input type="radio" name="P1_Cau_10" value="C"> <b>C.</b> $F''(x) = 1+\dfrac{1}{x}+\ln x$</label><label><input type="radio" name="P1_Cau_10" value="D"> <b>D.</b> $F''(x) = x+\ln x$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)= \displaystyle\int\limits (x+1)\ln x \mathrm{\,d}x$ $ \Rightarrow F'(x)=(x+1)\ln x \Rightarrow F''(x)=1+\dfrac{1}{x}+\ln x $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 11:</b> Nếu $\displaystyle\int f(x) \mathrm{\,d}x=\dfrac{1}{x}+\ln \left|x\right|+C$ thì $f(x)$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_11" value="A"> <b>A.</b> $f(x)=-\dfrac{1}{x^2}+\ln\left|x\right|$</label><label><input type="radio" name="P1_Cau_11" value="B"> <b>B.</b> $f(x)=\sqrt{x}+\ln \left|x\right|$</label><label><input type="radio" name="P1_Cau_11" value="C"> <b>C.</b> $f(x)=\dfrac{1}{x}-\dfrac{1}{x^2}$</label><label><input type="radio" name="P1_Cau_11" value="D"> <b>D.</b> $f(x)=-\sqrt{x}+\dfrac{1}{x}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $f(x)=\left(\dfrac{1}{x}+\ln \left|x\right|+C\right)'=-\dfrac{1}{x^2}+\dfrac{1}{x}$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 12:</b> Họ nguyên hàm của hàm số $f(x)=3x^2+2x+5$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_12" value="A"> <b>A.</b> $F(x)=x^3+x^2+5$</label><label><input type="radio" name="P1_Cau_12" value="B"> <b>B.</b> $F(x)=x^3+x^2+C$</label><label><input type="radio" name="P1_Cau_12" value="C"> <b>C.</b> $F(x)=x^3+x^2+C$</label><label><input type="radio" name="P1_Cau_12" value="D"> <b>D.</b> $F(x)=x^3+x^2+5x+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle\int (3x^2+2x+5)\mathrm{\,d}x=x^3+x^2+5x+C$, $(C\in\mathbb{R})$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 13:</b> Họ nguyên hàm của hàm số $y=2x(1+3x^3)$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_13" value="A"> <b>A.</b> $F(x)=x^2(x+x^3)+C$</label><label><input type="radio" name="P1_Cau_13" value="B"> <b>B.</b> $F(x)=2x(x+x^3)+C$</label><label><input type="radio" name="P1_Cau_13" value="C"> <b>C.</b> $F(x)=x^2(1+3x^2)+C$</label><label><input type="radio" name="P1_Cau_13" value="D"> <b>D.</b> $F(x)=x^2 \left( 1+\dfrac{6x^3}{5} \right) +C $</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\int 2x(1+3x^3)\mathrm{\,d}x = \int \left(2x+6x^4 \right) \mathrm{\,d}x = x^2+\dfrac{6}{5} x^5 + C= x^2 \left( 1+\dfrac{6x^3}{5} \right) + C.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 14:</b> Tìm họ nguyên hàm của hàm số $f(x)=4x^3+2x+\dfrac{1}{2\sqrt{x}}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_14" value="A"> <b>A.</b> $\displaystyle \int f(x)\mathrm{d}x=\dfrac{x^4}{4}+x^2+\sqrt{x}+C$</label><label><input type="radio" name="P1_Cau_14" value="B"> <b>B.</b> $\displaystyle \int f(x)\mathrm{d}x=\dfrac{x^4}{4}+2x+\sqrt{x}+C$</label><label><input type="radio" name="P1_Cau_14" value="C"> <b>C.</b> $\displaystyle \int f(x)\mathrm{d}x=x^4+x^2+\sqrt{x}+C$</label><label><input type="radio" name="P1_Cau_14" value="D"> <b>D.</b> $\displaystyle \int f(x)\mathrm{d}x=12x^2+2-\dfrac{1}{4x\sqrt{x}}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle \int \left(4x^3+2x+\dfrac{1}{2\sqrt{x}}\right)\mathrm{d}x=x^4+x^2+\sqrt{x}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 15:</b> Họ nguyên hàm của hàm số $f(x)=\dfrac{1}{x+1}$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_15" value="A"> <b>A.</b> $\ln\left|2x+2\right|+C$</label><label><input type="radio" name="P1_Cau_15" value="B"> <b>B.</b> $-\dfrac{1}{2}\ln(x+1)^2+C$</label><label><input type="radio" name="P1_Cau_15" value="C"> <b>C.</b> $-\dfrac{1}{(x+1)^2}+C$</label><label><input type="radio" name="P1_Cau_15" value="D"> <b>D.</b> $-\ln\left|x+1\right|+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int \dfrac{1}{x+1} \mathrm{\,d}x=\ln \left|x+1\right|+C'=\ln 2+\ln \left|x+1\right|+C=\ln\left|2x+2\right|+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 16:</b> Họ nguyên hàm của hàm số $f(x)=\mathrm{e}^x+x$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_16" value="A"> <b>A.</b> $\mathrm{e}^x+\dfrac{1}{2}x^2+C$</label><label><input type="radio" name="P1_Cau_16" value="B"> <b>B.</b> $\dfrac{1}{x+1}\mathrm{e}^x+\dfrac{1}{2}\mathrm{e}^x+\dfrac{1}{2}\mathrm{e}^x+C$</label><label><input type="radio" name="P1_Cau_16" value="C"> <b>C.</b> $\mathrm{e}^x+x^2+C$</label><label><input type="radio" name="P1_Cau_16" value="D"> <b>D.</b> $\mathrm{e}^x+1+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int f(x) \mathrm{\,d}x=\displaystyle\int \left(\mathrm{e}^x+x\right) \mathrm{\,d}x=\mathrm{e}^x+\dfrac{1}{2}x^2+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 17:</b> Tìm nguyên hàm $F(x)=\displaystyle\int\limits{\pi^2\mathrm{\,d}x}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_17" value="A"> <b>A.</b> $F(x)=\pi^2x+C$</label><label><input type="radio" name="P1_Cau_17" value="B"> <b>B.</b> $2\pi x+C$</label><label><input type="radio" name="P1_Cau_17" value="C"> <b>C.</b> $F(x)=\dfrac{\pi^3}{3}+C$</label><label><input type="radio" name="P1_Cau_17" value="D"> <b>D.</b> $F(x)=\dfrac{\pi^2x^2}{2}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle\int\limits {\pi^2\mathrm{\,d}x}=\pi^2x+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 18:</b> Nguyên hàm của hàm số $f(x)=\dfrac1{x+2}$ trên khoảng $(-\infty;-2)$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_18" value="A"> <b>A.</b> $\ln|x+2|+C$</label><label><input type="radio" name="P1_Cau_18" value="B"> <b>B.</b> $\dfrac12\ln|x+2|+C$</label><label><input type="radio" name="P1_Cau_18" value="C"> <b>C.</b> $\ln(x+2)+C$</label><label><input type="radio" name="P1_Cau_18" value="D"> <b>D.</b> $\dfrac12\ln(x+2)+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Nguyên hàm của hàm số $f(x)=\dfrac1{x+2}$ trên khoảng $(-\infty;-2)$ là $\ln|x+2|+C.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 19:</b> Hàm số nào sau đây <b>không</b> phải là một nguyên hàm của hàm số $f(x)=(2x-3)^3$?</div></div><div class="options"><label><input type="radio" name="P1_Cau_19" value="A"> <b>A.</b> $F(x)=\dfrac{(2x-3)^4}{8}+8$</label><label><input type="radio" name="P1_Cau_19" value="B"> <b>B.</b> $F(x)=\dfrac{(2x-3)^4}{8}-3$</label><label><input type="radio" name="P1_Cau_19" value="C"> <b>C.</b> $F(x)=\dfrac{(2x-3)^4}{8}$</label><label><input type="radio" name="P1_Cau_19" value="D"> <b>D.</b> $F(x)=\dfrac{(2x-3)^4}{4}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int (2x-3)^3 \mathrm{\,d}x=\dfrac{1}{2}\cdot\dfrac{(2x-3)^4}{4}+C=\dfrac{(2x-3)^4}{8}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 20:</b> Tìm $H=\displaystyle\int\sqrt[4]{2x-1}\mathrm{\,d}x$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_20" value="A"> <b>A.</b> $H=\dfrac{2}{5}(2x-1)^{\tfrac{5}{4}}+C$</label><label><input type="radio" name="P1_Cau_20" value="B"> <b>B.</b> $H=(2x-1)^{\tfrac{5}{4}}+C$</label><label><input type="radio" name="P1_Cau_20" value="C"> <b>C.</b> $H=\dfrac{1}{5}(2x-1)^{\tfrac{5}{4}}+C$</label><label><input type="radio" name="P1_Cau_20" value="D"> <b>D.</b> $H=\dfrac{8}{5}(2x-1)^{\tfrac{5}{4}}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có: $H=\displaystyle\int\sqrt[4]{2x-1}\mathrm{\,d}x=\int (2x-1)^{\frac{1}{4}}\mathrm{\,d}x=\dfrac{1}{2}\cdot\dfrac{(2x-1)^{\frac{1}{4}+1}}{\frac{1}{4}+1}+C=\dfrac{2}{5} (2x-1)^{\frac{5}{4}}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 21:</b> Tìm nguyên hàm $F(x)=\displaystyle \int{ \left(  \dfrac{1}{x^2}+2 \right) \mathrm{\,d}x}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_21" value="A"> <b>A.</b> $F(x)=-\dfrac{1}{x} +2x+C$</label><label><input type="radio" name="P1_Cau_21" value="B"> <b>B.</b> $F(x)=\dfrac{1}{x} +2x+C$</label><label><input type="radio" name="P1_Cau_21" value="C"> <b>C.</b> $F(x)=-\dfrac{1}{x} +2+C$</label><label><input type="radio" name="P1_Cau_21" value="D"> <b>D.</b> $F(x)=-\dfrac{1}{x^3} +2x+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle \int{ \left(  \dfrac{1}{x^2}+2 \right) \mathrm{\,d}x} = -\dfrac{1}{x} +2x+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 22:</b> Tìm họ nguyên hàm của hàm số $f(x)=\dfrac{2x^2+x-1}{x^2}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_22" value="A"> <b>A.</b> $\displaystyle \int \dfrac{2x^2+x-1}{x^2} \mathrm{d}x = 2+ \dfrac{1}{x} - \dfrac{1}{x^2} + \mathrm{C}$</label><label><input type="radio" name="P1_Cau_22" value="B"> <b>B.</b> $\displaystyle \int \dfrac{2x^2+x-1}{x^2} \mathrm{d}x = 2x + \dfrac{1}{x} +\ln |x| + \mathrm{C}$</label><label><input type="radio" name="P1_Cau_22" value="C"> <b>C.</b> $\displaystyle \int \dfrac{2x^2+x-1}{x^2} \mathrm{d}x = x^2+ \ln |x| + \dfrac{1}{x} + \mathrm{C}$</label><label><input type="radio" name="P1_Cau_22" value="D"> <b>D.</b> $\displaystyle \int \dfrac{2x^2+x-1}{x^2} \mathrm{d}x = x^2 - \dfrac{1}{x} + \ln |x| + \mathrm{C}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $$\displaystyle \int \dfrac{2x^2+x-1}{x^2} \mathrm{d}x = \int \left( 2+\dfrac{1}{x} - \dfrac{1}{x^2}\right) \mathrm{d}x = 2x + \ln |x| +\dfrac{1}{x} + \mathrm{C}.$$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 23:</b> Tìm họ nguyên hàm $F(x)$ của hàm số $f(x)=\dfrac{{(x+1)}^3}{x^3},(x\neq 0)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_23" value="A"> <b>A.</b> $F(x)=x-3\ln |x|-\dfrac{3}{x}+\dfrac{1}{2x^2}+C$</label><label><input type="radio" name="P1_Cau_23" value="B"> <b>B.</b> $F(x)=x-3\ln |x|+\dfrac{3}{x}+\dfrac{1}{2x^2}+C$</label><label><input type="radio" name="P1_Cau_23" value="C"> <b>C.</b> $F(x)=x+3\ln | x|-\dfrac{3}{x}-\dfrac{1}{2x^2}+C$</label><label><input type="radio" name="P1_Cau_23" value="D"> <b>D.</b> $F(x)=x-3\ln |x|+\dfrac{3}{x}-\dfrac{1}{2x^2}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $f(x)=1+\dfrac{3}{x}+\dfrac{3}{x^2}+\dfrac{1}{x^3}$, do đó $F(x)=x+3\ln | x|-\dfrac{3}{x}-\dfrac{1}{2x^2}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 24:</b> Họ tất cả các nguyên hàm của hàm số $f(x)=\dfrac{1}{\sqrt{x+3}-\sqrt{x+1}}$ trên khoảng $(-1;+\infty)$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_24" value="A"> <b>A.</b> $(x+3)\sqrt{x+3}-(x+1)\sqrt{x+1}+C$</label><label><input type="radio" name="P1_Cau_24" value="B"> <b>B.</b> $\dfrac{3}{4}\left[(x+3)\sqrt{x+3}+(x+1)\sqrt{x+1}\right]+C$</label><label><input type="radio" name="P1_Cau_24" value="C"> <b>C.</b> $\dfrac{1}{3}\left[(x+3)\sqrt{x+3}+(x+1)\sqrt{x+1}\right]+C$</label><label><input type="radio" name="P1_Cau_24" value="D"> <b>D.</b> $\dfrac{1}{4}\left[(x+3)\sqrt{x+3}+(x+1)\sqrt{x+1}\right]+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có: \begin{align*}
+			\displaystyle\int f(x)\mathrm{\,d}x&amp;= \displaystyle\int\dfrac{\mathrm{\,d}x}{\sqrt{x+3}-\sqrt{x+1}}=\displaystyle\int\dfrac{\sqrt{x+3}+\sqrt{x+1}}{2}\mathrm{\,d}x\\
+			&amp;= \dfrac{1}{2}\displaystyle\int\left[(x+3)^{\tfrac{1}{2}}+(x+1)^{\tfrac{1}{2}}\right]\mathrm{\,d}x=\dfrac{1}{3}\left[(x+3)^{\tfrac{3}{2}}+(x+1)^{\tfrac{3}{2}}\right]+C\\
+			&amp;= \dfrac{1}{3}\left[(x+3)\sqrt{x+3}+(x+1)\sqrt{x+1}\right]+C.
+		\end{align*}</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 25:</b> Cho $F(x)$ là một nguyên hàm của hàm số $f(x)=\dfrac4{1-4x}$ trên khoảng $\left(-\infty; \dfrac14\right)$ thỏa mãn $F(0)=10.$ Tính $F(-1)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_25" value="A"> <b>A.</b> $F(-1)=10-4\ln5$</label><label><input type="radio" name="P1_Cau_25" value="B"> <b>B.</b> $F(-1)=10+4\ln5$</label><label><input type="radio" name="P1_Cau_25" value="C"> <b>C.</b> $F(-1)=10+\ln5$</label><label><input type="radio" name="P1_Cau_25" value="D"> <b>D.</b> $F(-1)=10-\ln5$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Do $F(x)$ là một nguyên hàm của $f(x)=\dfrac4{1-4x}$ nên $F(x)$ có dạng $F(x)=-\ln|1-4x|+C.$ Lại có $F(0)=10$ nên $C=10.$ Vậy $F(-1)=-\ln5+10.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 26:</b> Tìm họ nguyên hàm của hàm số $f(x)= \dfrac{x^2 -x +1}{x-1}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_26" value="A"> <b>A.</b> $x + \dfrac{1}{x-1} + C$</label><label><input type="radio" name="P1_Cau_26" value="B"> <b>B.</b> $x + \dfrac{1}{(x-1)^2} + C$</label><label><input type="radio" name="P1_Cau_26" value="C"> <b>C.</b> $\dfrac{x^2}{2} + \ln \vert x-1 \vert + C$</label><label><input type="radio" name="P1_Cau_26" value="D"> <b>D.</b> $x^2 + \ln \vert x-1 \vert + C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle \int \dfrac{x^2 -x +1}{x-1} \mathrm{\,d}x 
+		= \int \left( x + \dfrac{1}{x-1} \right) \mathrm{\,d}x 
+		= \dfrac{x^2}{2} + \ln \vert x-1 \vert + C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 27:</b> Tính $\displaystyle\int\dfrac{1}{2x^2+5x+2}\mathrm{\,d}x$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_27" value="A"> <b>A.</b> $\dfrac{1}{3}\ln\left|\dfrac{x+2}{2x+1}\right|+C$</label><label><input type="radio" name="P1_Cau_27" value="B"> <b>B.</b> $\ln\left|\dfrac{x+2}{2x+1}\right|+C$</label><label><input type="radio" name="P1_Cau_27" value="C"> <b>C.</b> $\dfrac{1}{3}\ln\left|\dfrac{2x+1}{x+2}\right|+C$</label><label><input type="radio" name="P1_Cau_27" value="D"> <b>D.</b> $\ln\left|2x^2+5x+2\right|+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> \begin{align*}
+			\text{Ta có } \displaystyle\int\dfrac{1}{2x^2+5x+2}\mathrm{\,d}x=\displaystyle\int\dfrac{1}{(2x+1)(x+2)}\mathrm{\,d}x&amp;=\dfrac{2}{3}\displaystyle\int\dfrac{1}{2x+1}\mathrm{\,d}x-\dfrac{1}{3}\displaystyle\int\dfrac{1}{x+2}\mathrm{\,d}x\\
+			&amp;=\dfrac{2}{3}\cdot\dfrac{1}{2}\ln\left|2x+1\right|-\dfrac{1}{3}\ln\left|x+2\right|+C\\
+			&amp;=\dfrac{1}{3}\ln\left|\dfrac{2x+1}{x+2}\right|+C.
+		\end{align*}</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 28:</b> Tìm $F(x) =  \displaystyle \int \dfrac{6x + 2}{3x - 1} \mathrm{\, d} x $.</div></div><div class="options"><label><input type="radio" name="P1_Cau_28" value="A"> <b>A.</b> $ F(x) = \displaystyle 2x + \dfrac{4}{3}\ln|3x - 1| + C $</label><label><input type="radio" name="P1_Cau_28" value="B"> <b>B.</b> $ F(x) = \displaystyle 2x + 4\ln|3x - 1| + C $</label><label><input type="radio" name="P1_Cau_28" value="C"> <b>C.</b> $ F(x) = \displaystyle  \dfrac{4}{3}\ln|3x - 1| + C $</label><label><input type="radio" name="P1_Cau_28" value="D"> <b>D.</b> $ F(x) = \displaystyle 2x + 4\ln(3x - 1) + C $</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $ F(x) = \displaystyle \int \dfrac{6x + 2}{3x - 1} \mathrm{\, d} x = \int \left ( 2 + \dfrac{4}{3x-1} \right ) \mathrm{\, d}x = 2x + \dfrac{4}{4} \ln |3x - 1| + C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 29:</b> Hàm số $F\left(x\right)$ nào sau đây là một nguyên hàm của hàm số $f\left(x\right) = \dfrac{x + 3}{x^2 + 4x + 3}$?</div></div><div class="options"><label><input type="radio" name="P1_Cau_29" value="A"> <b>A.</b> $F\left(x\right) = 2\ln\left\vert x + 3\right\vert - \ln\left\vert x + 1\right\vert + C$</label><label><input type="radio" name="P1_Cau_29" value="B"> <b>B.</b> $F\left(x\right) = \ln\left(2\left\vert x + 1\right\vert\right)$</label><label><input type="radio" name="P1_Cau_29" value="C"> <b>C.</b> $F\left(x\right) = \ln\left\vert\dfrac{ x + 1}{x + 3}\right\vert + 2$</label><label><input type="radio" name="P1_Cau_29" value="D"> <b>D.</b> $F\left(x\right) = \ln\left[\left(x + 1\right)\left(x + 3\right)\right]$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $$\displaystyle\int\dfrac{x  + 3}{x^2 + 4x + 3}\, \mathrm{d}x = \displaystyle\int\dfrac{x  + 3}{\left(x + 3\right)\left(x + 1\right)}\, \mathrm{d}x = \displaystyle\int\dfrac{\mathrm{d}x}{x + 1} = \ln\left\vert x + 1\right\vert + C'$$ Chọn $C = \ln 2$ suy ra $\ln\left\vert x + 1\right\vert + C =  \left\vert x + 1\right\vert + \ln2  = \ln2\left\vert x + 1\right\vert$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 30:</b> Nguyên hàm $I= \displaystyle\int \limits \dfrac{2x^2-7x+5}{x-3} \mathrm{\,d}x$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_30" value="A"> <b>A.</b> $I = x^2 - x+2 \ln |x-3|+C$</label><label><input type="radio" name="P1_Cau_30" value="B"> <b>B.</b> $I = x^2 - x-2 \ln |x-3|+C$</label><label><input type="radio" name="P1_Cau_30" value="C"> <b>C.</b> $I = 2x^2 - x+2 \ln |x-3|+C$</label><label><input type="radio" name="P1_Cau_30" value="D"> <b>D.</b> $I = 2x^2 - x-2 \ln |x-3|+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $I= \displaystyle\int \limits \dfrac{2x^2-7x+5}{x-3} \mathrm{\,d}x = \displaystyle\int \limits \left( 2x-1+\dfrac{2}{x-3}\right) \mathrm{\,d}x = x^2-x+2\ln \left|x-3\right|+C.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 31:</b> Nguyên hàm của hàm số $y=\mathrm{e}^{-3x+1}$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_31" value="A"> <b>A.</b> $\dfrac{1}{3}\mathrm{e}^{-3x+1}+C$</label><label><input type="radio" name="P1_Cau_31" value="B"> <b>B.</b> $-3\mathrm{e}^{-3x+1}+C$</label><label><input type="radio" name="P1_Cau_31" value="C"> <b>C.</b> $-\dfrac{1}{3}\mathrm{e}^{-3x+1}+C$</label><label><input type="radio" name="P1_Cau_31" value="D"> <b>D.</b> $3\mathrm{e}^{-3x+1}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có: $\displaystyle\int \mathrm{e}^{-3x+1} \mathrm{\,d}x=-\dfrac{1}{3}\mathrm{e}^{-3x+1}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 32:</b> Tìm nguyên hàm $F(x)$ của hàm số $f(x)=2^{2x}\left(3^x-\dfrac{\sqrt{x}}{4^x}\right)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_32" value="A"> <b>A.</b> $F(x)=\dfrac{12^x}{\ln 12}-\dfrac{2x\sqrt{x}}{3}+C$</label><label><input type="radio" name="P1_Cau_32" value="B"> <b>B.</b> $F(x)=12^x+x\sqrt{x}+C$</label><label><input type="radio" name="P1_Cau_32" value="C"> <b>C.</b> $F(x)=\dfrac{2^{2x}}{\ln 2}\left(\dfrac{3^x}{\ln 3}-\dfrac{x\sqrt{x}}{4^x}\right)+C$</label><label><input type="radio" name="P1_Cau_32" value="D"> <b>D.</b> $F(x)=\dfrac{2^{2x}}{\ln 2}\left(\dfrac{3^x}{\ln 3}-\dfrac{x\sqrt{x}\ln 4}{4^x}\right)+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có: $f(x)=12^x-\sqrt{x}$ nên $\displaystyle F(x)=\int f(x) \mathrm{\,d}x=\dfrac{12^x}{\ln 12}-\dfrac{2x\sqrt{x}}{3}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 33:</b> Họ nguyên hàm của hàm số $f(x)=2^x+1$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_33" value="A"> <b>A.</b> $2^x \ln 2+x+C$</label><label><input type="radio" name="P1_Cau_33" value="B"> <b>B.</b> $ \dfrac{2^x}{\ln 2}+x+C$</label><label><input type="radio" name="P1_Cau_33" value="C"> <b>C.</b> $\dfrac{2^x}{\ln 2}+C$</label><label><input type="radio" name="P1_Cau_33" value="D"> <b>D.</b> $2^x+x+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int\limits \left( 2^x+1 \right)\mathrm{\,d}x = \dfrac{2^x}{\ln 2}+x+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 34:</b> Tìm nguyên hàm của hàm số $f(x)=5^x$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_34" value="A"> <b>A.</b> $\displaystyle\int f(x)\mathrm{\,d}x=5^x\ln 5+C$</label><label><input type="radio" name="P1_Cau_34" value="B"> <b>B.</b> $\displaystyle\int f(x)\mathrm{\,d}x=5^x+C$</label><label><input type="radio" name="P1_Cau_34" value="C"> <b>C.</b> $\displaystyle\int f(x)\mathrm{\,d}x=\dfrac{5^x}{\ln x}+C$</label><label><input type="radio" name="P1_Cau_34" value="D"> <b>D.</b> $\displaystyle\int f(x)\mathrm{\,d}x=\dfrac{5^x}{\ln 5}+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int f(x)\mathrm{\,d}x=\displaystyle\int 5^x\mathrm{\,d}x=\dfrac{5^x}{\ln 5}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 35:</b> Họ các nguyên hàm của hàm số $y = 10^{2x}$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_35" value="A"> <b>A.</b> $\dfrac{10^x}{2 \ln 10} + C$</label><label><input type="radio" name="P1_Cau_35" value="B"> <b>B.</b> $10^{2x} 2 \ln 10 + C$</label><label><input type="radio" name="P1_Cau_35" value="C"> <b>C.</b> $\dfrac{10^{2x}}{2 \ln 10} + C$</label><label><input type="radio" name="P1_Cau_35" value="D"> <b>D.</b> $\dfrac{10^{2x}}{ \ln 10} + C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle \int 10^{2x} \mathrm{d}x = \dfrac{10^{2x}}{2. \ln 10} + C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 36:</b> Tìm họ nguyên hàm của hàm số $f(x)=\mathrm{e}^{2018x}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_36" value="A"> <b>A.</b> $\displaystyle\int f(x)\mathrm{\,d}x=\mathrm{e}^{2018x}+C$</label><label><input type="radio" name="P1_Cau_36" value="B"> <b>B.</b> $\displaystyle\int f(x)\mathrm{\,d}x=\dfrac{1}{2018}\cdot \mathrm{e}^{2018x}+C$</label><label><input type="radio" name="P1_Cau_36" value="C"> <b>C.</b> $\displaystyle\int f(x)\mathrm{\,d}x=2018\mathrm{e}^{2018x}+C$</label><label><input type="radio" name="P1_Cau_36" value="D"> <b>D.</b> $\displaystyle\int f(x)\mathrm{\,d}x=\mathrm{e}^{2018x}\cdot \ln 2018+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int f(x)\mathrm{\,d}x=\displaystyle\int \dfrac{1}{2018}\cdot \mathrm{e}^{2018x}\mathrm{\,d}(2018x)=\dfrac{1}{2018}\cdot \mathrm{e}^{2018x}+C$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 37:</b> Tìm họ nguyên hàm của hàm số $f(x) = \sin(3ax + 1)$ (với $a$ là tham số khác $0$).</div></div><div class="options"><label><input type="radio" name="P1_Cau_37" value="A"> <b>A.</b> $\cos(3ax + 1) + C$</label><label><input type="radio" name="P1_Cau_37" value="B"> <b>B.</b> $\dfrac{1}{3a} \cos(3ax + 1) + C$</label><label><input type="radio" name="P1_Cau_37" value="C"> <b>C.</b> $-\dfrac{1}{3a} \cos(3ax + 1) + C$</label><label><input type="radio" name="P1_Cau_37" value="D"> <b>D.</b> $-\cos(3ax + 1) + C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int {\sin (3ax+1)}\mathrm{\, d}x=\dfrac{1}{3a}\displaystyle\int {\sin (3ax+1)}\mathrm{\, d}(3ax+1)=-\dfrac{1}{3a} \cos(3ax + 1) + C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 38:</b> Tìm nguyên hàm $F(x)$ của hàm số $f(x)=\cos \dfrac{x}{2}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_38" value="A"> <b>A.</b> $F(x)=2\sin \dfrac{x}{2} + C$</label><label><input type="radio" name="P1_Cau_38" value="B"> <b>B.</b> $F(x)=\dfrac{1}{2}\sin \dfrac{x}{2} + C$</label><label><input type="radio" name="P1_Cau_38" value="C"> <b>C.</b> $F(x)=-2\sin \dfrac{x}{2} + C$</label><label><input type="radio" name="P1_Cau_38" value="D"> <b>D.</b> $F(x)=-\dfrac{1}{2}\sin \dfrac{x}{2} + C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle \int \cos \dfrac{x}{2} \mathrm{\,d}x=2\sin\dfrac{x}{2}+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 39:</b> Hàm số $F(x)=2\sin x-3\cos x$ là một nguyên hàm của hàm số nào sau đây?</div></div><div class="options"><label><input type="radio" name="P1_Cau_39" value="A"> <b>A.</b> $f(x)=-2\cos x-3\sin x$</label><label><input type="radio" name="P1_Cau_39" value="B"> <b>B.</b> $f(x)=-2\cos x+3\sin x$</label><label><input type="radio" name="P1_Cau_39" value="C"> <b>C.</b> $f(x)=2\cos x+3\sin x$</label><label><input type="radio" name="P1_Cau_39" value="D"> <b>D.</b> $f(x)=2\cos x-3\sin x$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F'(x)=2\cos x+3\sin x$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 40:</b> Họ nguyên hàm của hàm số $f(x)=\sin{5x}+2$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_40" value="A"> <b>A.</b> $5\cos{5x}+C$</label><label><input type="radio" name="P1_Cau_40" value="B"> <b>B.</b> $  -\dfrac{1}{5}\cos{5x}+2x+C$</label><label><input type="radio" name="P1_Cau_40" value="C"> <b>C.</b> $\dfrac{1}{5}\cos{5x}+2x+C$</label><label><input type="radio" name="P1_Cau_40" value="D"> <b>D.</b> $\cos{5x}+2x+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có: $\displaystyle \int f(x) dx =\displaystyle \int (\sin {5x}+2) dx= -\dfrac{1}{5}\cos{5x}+2x+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 41:</b> Tìm nguyên hàm của hàm số $f(x)=\dfrac{1}{{{\sin }^{2}}\left( x+\dfrac{\pi }{3} \right)}$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_41" value="A"> <b>A.</b> $\displaystyle\int f(x) \mathrm{\,d}x=-\cot \left( x+\dfrac{\pi }{3} \right)+C$</label><label><input type="radio" name="P1_Cau_41" value="B"> <b>B.</b> $\displaystyle\int f(x) \mathrm{\,d}x=-\dfrac{1}{3}\cot \left( x+\dfrac{\pi }{3} \right)+C$</label><label><input type="radio" name="P1_Cau_41" value="C"> <b>C.</b> $\displaystyle\int f(x) \mathrm{\,d}x=\cot \left( x+\dfrac{\pi }{3} \right)+C$</label><label><input type="radio" name="P1_Cau_41" value="D"> <b>D.</b> $\displaystyle\int f(x) \mathrm{\,d}x=\dfrac{1}{3}\cot \left( x+\dfrac{\pi }{3} \right)+C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int \dfrac{\mathrm{\,d}x}{\sin^2 \left(x+\dfrac{\pi}{3}\right)}=\displaystyle\int \dfrac{\mathrm{\,d}\left(x+\dfrac{\pi}{3}\right)}{\sin^2 \left(x+\dfrac{\pi}{3}\right)}= -\cot \left( x+\dfrac{\pi }{3} \right)+C$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 42:</b> Hàm số nào sau đây là một nguyên hàm của hàm số $ f(x)=4\sin^2x $?</div></div><div class="options"><label><input type="radio" name="P1_Cau_42" value="A"> <b>A.</b> $ 2x-\cos2x $</label><label><input type="radio" name="P1_Cau_42" value="B"> <b>B.</b> $ 2x+\sin2x $</label><label><input type="radio" name="P1_Cau_42" value="C"> <b>C.</b> $ 2x+\cos2x $</label><label><input type="radio" name="P1_Cau_42" value="D"> <b>D.</b> $ 2x-\sin2x $</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $ \displaystyle\int\limits f(x) \mathrm{\,d}x = \displaystyle\int\limits 2(1-\cos2x) \mathrm{\,d}x =2\left( x-\dfrac{1}{2}\sin2x \right) + C = 2x-\sin2x + C $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 43:</b> Khi tính $ \displaystyle \int \sin ax \cdot \cos bx \mathrm{\,d}x $, biến đổi nào dưới đây là đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_43" value="A"> <b>A.</b> $ \displaystyle \int \sin ax \cdot \cos bx \mathrm{\,d}x = \int \sin ax \mathrm{\,d}x \cdot \int \cos bx \mathrm{\,d}x $</label><label><input type="radio" name="P1_Cau_43" value="B"> <b>B.</b> $ \displaystyle\int \sin ax \cdot \cos bx \mathrm{\,d}x = \dfrac{1}{2} \int \left [ \sin \left(a+b\right)x+\sin \left(a-b\right)x\right] \mathrm{\,d}x $</label><label><input type="radio" name="P1_Cau_43" value="C"> <b>C.</b> $ \displaystyle \int \sin ax \cdot \cos bx \mathrm{\,d}x = \dfrac{1}{2} \int \left[ \sin \dfrac{a+b}{2}x + \sin \dfrac{a-b}{2}x \right] \mathrm{\,d}x $</label><label><input type="radio" name="P1_Cau_43" value="D"> <b>D.</b> $ \displaystyle \int \sin ax \cdot \cos bx \mathrm{\,d}x = ab \int \sin x \cdot \cos x \mathrm{\,d}x $</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $	\sin ax \cdot \cos bx = \dfrac{1}{2}\left[\sin \left(a + b\right)x + \sin \left(a - b\right)x\right] $.<br> Do đó $ \displaystyle\int \sin ax \cdot \cos bx \mathrm{\,d}x = \dfrac{1}{2} \int \left[ \sin \left(a+b\right)x+\sin \left(a-b\right)x\right] \mathrm{\,d}x $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 44:</b> $F(x)$ là một nguyên hàm của hàm số $y=2\sin x\cos {3x}$ và $F(0)=0$, khi đó</div></div><div class="options"><label><input type="radio" name="P1_Cau_44" value="A"> <b>A.</b> $F(x)=\cos 4x-\cos 2x$</label><label><input type="radio" name="P1_Cau_44" value="B"> <b>B.</b> $F(x)=\dfrac{\cos 2x}{4}-\dfrac{\cos 4x}{8}-\dfrac{1}{8}$</label><label><input type="radio" name="P1_Cau_44" value="C"> <b>C.</b> $F(x)=\dfrac{\cos 2x}{2}-\dfrac{\cos 4x}{4}-\dfrac{1}{4}$</label><label><input type="radio" name="P1_Cau_44" value="D"> <b>D.</b> $F(x)=\dfrac{\cos 4x}{4}-\dfrac{\cos 2x}{2}+\dfrac{1}{4}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle\int\limits 2\sin x\cos {3x} \mathrm{\,d}x=\displaystyle\int\limits \left[-\sin 2x+\sin 4x\right]\mathrm{\,d}x=\dfrac{\cos 2x}{2}-\dfrac{\sin 4x}{2}+C$.<br> Vì $F(0)=0$, suy ra $C=-\dfrac{1}{4}$.<br> Vậy $F(x)=\dfrac{\cos 2x}{2}-\dfrac{\cos 4x}{4}-\dfrac{1}{4}$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 45:</b> Tìm một nguyên hàm $F(x)$ của hàm số $f(x)=\cot^2x,$ biết $F\left(\dfrac{\pi}{4}\right)=0 $.</div></div><div class="options"><label><input type="radio" name="P1_Cau_45" value="A"> <b>A.</b> $F(x)=\tan^2x+C$</label><label><input type="radio" name="P1_Cau_45" value="B"> <b>B.</b> $F(x)=-\cot x-x+1+\dfrac{\pi}{4}$</label><label><input type="radio" name="P1_Cau_45" value="C"> <b>C.</b> $F(x)=-\dfrac{1}{\sin x}+\dfrac{\sqrt{2}}{2}$</label><label><input type="radio" name="P1_Cau_45" value="D"> <b>D.</b> $F(x)=-\dfrac{1}{{\sin}^2x}+1+\dfrac{\sqrt{2}}{2}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int\limits \cot^2x\mathrm{\, d}x = \int\limits \left(\dfrac{1}{\sin^2x}-1 \right)\mathrm{\, d}x=-\cot x-x+C. $<br> Vì $F\left({\dfrac{\pi}{4}}\right)=0 \Leftrightarrow -1-\dfrac{\pi}{4}+C=0 \Leftrightarrow C=\dfrac{\pi}{4}+1$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 46:</b> Họ nguyên hàm của hàm số $y=(1+\sin x)^2$ là</div></div><div class="options"><label><input type="radio" name="P1_Cau_46" value="A"> <b>A.</b> $F(x)= \dfrac{2}{3}x-  2 \cos x -\dfrac{1}{4} \sin 2x +C$</label><label><input type="radio" name="P1_Cau_46" value="B"> <b>B.</b> $F(x)=\dfrac{3}{2}x - 2 \cos x +\dfrac{1}{4} \sin 2x +C$</label><label><input type="radio" name="P1_Cau_46" value="C"> <b>C.</b> $F(x)=\dfrac{3}{2}x +2 \cos x -\dfrac{1}{4} \sin 2x +C$</label><label><input type="radio" name="P1_Cau_46" value="D"> <b>D.</b> $F(x)=\dfrac{3}{2}x -2 \cos x -\dfrac{1}{4} \sin 2x +C$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> \begin{align*}
+			\displaystyle \int (1+\sin x)^2 \mathrm{\,d}x &amp;=  \displaystyle \int   \left( 1+2 \sin x +(\sin x)^2 \right) \mathrm{\,d}x \\ 
+			&amp;=  \displaystyle \int   \left( \dfrac{3}{2} + 2\sin x - \dfrac{1}{2} \cos 2x \right) \mathrm{\,d}x \\
+			&amp;=  \dfrac{3}{2}x - 2\cos x - \dfrac{1}{4}\sin 2x +C.
+		\end{align*}</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 47:</b> Cho hàm số $ y=f(x) $ thỏa mãn $ f'(x)=2018^x \ln 2018 -\cos x $ và $ f(0)=2 $. Phát biểu nào sau đây đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_47" value="A"> <b>A.</b> $ f(x)=2018^x+\sin x+1$</label><label><input type="radio" name="P1_Cau_47" value="B"> <b>B.</b> $ f(x)=\dfrac{2018^x}{\ln 2018}+\sin x+1$</label><label><input type="radio" name="P1_Cau_47" value="C"> <b>C.</b> $ f(x)=\dfrac{2018^x}{\ln 2018}-\sin x+1$</label><label><input type="radio" name="P1_Cau_47" value="D"> <b>D.</b> $ f(x)=2018^x-\sin x+1$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Vì $\displaystyle\int\limits \left(2018^x \ln 2018-\cos x\right)\mathrm{\,d}x=2018^x-\sin x+C$. Do $ f(0)=2 $ nên $ C=1 $.<br> Vậy $ f(x)=2018^x-\sin x+1 $.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 48:</b> Cho $\displaystyle\int f(x)\mathrm{\,d}x=3x^2-4x+C$. Tìm $\displaystyle\int f(\mathrm{e}^x)\mathrm{\,d}x$</div></div><div class="options"><label><input type="radio" name="P1_Cau_48" value="A"> <b>A.</b> $\displaystyle\int{f(\mathrm{e}^x)\mathrm{\,d}x=\dfrac{3}{2}{\mathrm{e}^{2x}}-4\mathrm{e}^x+C}$</label><label><input type="radio" name="P1_Cau_48" value="B"> <b>B.</b> $\displaystyle\int{f(\mathrm{e}^x)\mathrm{\,d}x=3\mathrm{e}^x{2x}-4\mathrm{e}^x+C}$</label><label><input type="radio" name="P1_Cau_48" value="C"> <b>C.</b> $\displaystyle\int{f(\mathrm{e}^x)\mathrm{\,d}x=6\mathrm{e}^x+4x+C}$</label><label><input type="radio" name="P1_Cau_48" value="D"> <b>D.</b> $\displaystyle\int{f(\mathrm{e}^x)\mathrm{\,d}x=6\mathrm{e}^x-4x+C}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int f(x)\mathrm{d\,}x=3x^2-4x+C\Rightarrow f(x)=6x-4$.<br> $\displaystyle\int f(\mathrm{e}^x)\mathrm{\,d}x=\displaystyle\int \left(6\mathrm{e}^x-4\right)\mathrm{\,d}x=\displaystyle\int{f(\mathrm{e}^x)\mathrm{\,d}x=6\mathrm{e}^x-4x+C}.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 49:</b> Cho biết $\displaystyle\int\dfrac{2x-13}{(x+1)(x-2)}\mathrm{\,d}x=a\ln|x+1|+b\ln|x-2|+C$. Mệnh đề nào sau đây đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_49" value="A"> <b>A.</b> $a+2b=8$</label><label><input type="radio" name="P1_Cau_49" value="B"> <b>B.</b> $a+b=8$</label><label><input type="radio" name="P1_Cau_49" value="C"> <b>C.</b> $2a-b=8$</label><label><input type="radio" name="P1_Cau_49" value="D"> <b>D.</b> $a-b=8$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Giả sử $2x-13=A(x+1)+B(x-2)\Leftrightarrow 2x-13=(A+B)x+A-2B.$<br> Đồng nhất thức hai vế ta có hệ $\left\{\begin{aligned}&amp;A+B=-2\\&amp;A-2B=-13\end{aligned}\right.\Leftrightarrow\left\{\begin{aligned}&amp;A=-3\\&amp;B=5.\end{aligned}\right.$</div><div class="tp">\begin{align*}
+				\displaystyle\int\dfrac{2x-13}{(x+1)(x-2)}\mathrm{\,d}x&amp;= \displaystyle\int\dfrac{-3(x+1)+5(x-2)}{(x+1)(x-2)}\mathrm{\,d}x\\
+				&amp;= \displaystyle\int\dfrac{-3}{x-2}\mathrm{\,d}x+\displaystyle\int\dfrac{5}{x+1}\mathrm{\,d}x\\
+				&amp;= -3\ln|x-2|+5\ln|x+1|+C.
+			\end{align*}</div><div class="tp">Suy ra $a=5$, $b=-3$, vậy $a-b=8.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 50:</b> Biết luôn có hai số $a$ và $b$ để $F(x)=\dfrac{ax+b}{x+4}\ (4a-b \neq 0)$ là nguyên hàm của hàm số $f(x)$ thỏa mãn $2f^2(x)=\left (F(x)-1\right )f'(x)$. Khẳng định nào dưới đây đúng và đầy đủ nhất?</div></div><div class="options"><label><input type="radio" name="P1_Cau_50" value="A"> <b>A.</b> $a=1,b=4$</label><label><input type="radio" name="P1_Cau_50" value="B"> <b>B.</b> $a=1,b=-1$</label><label><input type="radio" name="P1_Cau_50" value="C"> <b>C.</b> $a=1,b \in \mathbb{R} \backslash\{4\}$</label><label><input type="radio" name="P1_Cau_50" value="D"> <b>D.</b> $a \in \mathbb{R}, b \in \mathbb{R}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $f(x) =F'(x)= \dfrac{4a-b}{(x+4)^2}$; $f'(x) =\dfrac{-2(4a-b)}{(x+4)^3}$. <br> Thay vào biểu thức, ta có \begin{align*}
+			2f^2(x)=\left (F(x)-1\right )f'(x) &amp;\Leftrightarrow 4a-b=-(a-1)x-b+4 \\
+			&amp; \Leftrightarrow  (a-1)x+4(a-1)=0 \quad (1)
+		\end{align*} $(1)$ đúng với mọi $x \neq -4$ khi $a=1$, $4a-b \neq 0 \Rightarrow b \neq 4$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 51:</b> Gọi $F(x)=(ax^2+bx+c)\mathrm{e}^x$ là một nguyên hàm của hàm số $f(x)=(x-1)^2\mathrm{e}^x$. Tính $S=a+2b+c$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_51" value="A"> <b>A.</b> $S=3$</label><label><input type="radio" name="P1_Cau_51" value="B"> <b>B.</b> $S=-2$</label><label><input type="radio" name="P1_Cau_51" value="C"> <b>C.</b> $S=0$</label><label><input type="radio" name="P1_Cau_51" value="D"> <b>D.</b> $S=4$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F'(x)=(ax^2+bx+c)\mathrm{e}^x+(2ax+b)\mathrm{e}^x=(ax^2+(2a+b)x+b+c)\mathrm{e}^x$.<br> Đồng nhất hệ số với $f(x)$ ta có $$\left\{\begin{aligned}&amp; a=1 \\ &amp; 2a+b=-2\\&amp; b+c=1\end{aligned}\right.\Leftrightarrow \left\{\begin{aligned}&amp; a=1 \\ &amp; b=-4\\ &amp; c=5.\end{aligned}\right.$$ Vậy $a+2b+c=-2$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 52:</b> Cho hàm số $f(x)$ thỏa mãn $f'(x)=ax^2+\dfrac{b}{x^3}$, $f(-1)=2$, $f(1)=3$, $f'(1)=0$. Tính $a+2b$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_52" value="A"> <b>A.</b> $-\dfrac{3}{2}$</label><label><input type="radio" name="P1_Cau_52" value="B"> <b>B.</b> $0$</label><label><input type="radio" name="P1_Cau_52" value="C"> <b>C.</b> $5$</label><label><input type="radio" name="P1_Cau_52" value="D"> <b>D.</b> $\dfrac{3}{2}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $f(x)=\displaystyle\int \left(ax^2+\dfrac{b}{x^3}\right)\mathrm{d}x=\dfrac{ax^3}{3}-\dfrac{b}{2x^2}+c$.<br> Từ đó $$\left\{\begin{aligned}&amp; f(-1)=2 \\ &amp; f(1)=3 \\ &amp; f'(1)=0\end{aligned}\right.\Leftrightarrow \left\{\begin{aligned}&amp; -\dfrac{a}{3}-\dfrac{b}{2}+c=2 \\ 
+			&amp; \dfrac{a}{3}-\dfrac{b}{2}+c=3\\
+			&amp; a+b=0\end{aligned}\right.\Leftrightarrow \left\{\begin{aligned}&amp; a=\dfrac{3}{2} \\ &amp; b=-\dfrac{3}{2} \\ &amp; c=\dfrac{7}{4}.\end{aligned}\right.$$ Vậy $a+2b=-\dfrac{3}{2}.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 53:</b> Biết $F(x)$ là nguyên hàm của hàm số $f(x)=\dfrac{1}{2\sqrt{x+1}}+m-1$ thỏa mãn $F(0)=0$ và $F(3)=7$. Khi đó, giá trị của tham số $m$ bằng</div></div><div class="options"><label><input type="radio" name="P1_Cau_53" value="A"> <b>A.</b> $-2$</label><label><input type="radio" name="P1_Cau_53" value="B"> <b>B.</b> $3$</label><label><input type="radio" name="P1_Cau_53" value="C"> <b>C.</b> $-3$</label><label><input type="radio" name="P1_Cau_53" value="D"> <b>D.</b> $2$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $F(x)=\displaystyle\int \left(\dfrac{1}{2\sqrt{x+1}}+m-1\right) \mathrm{d}x=\sqrt{x+1}+(m-1)x+C$. <br> Theo giả thiết, ta có $\left\{\begin{aligned}
+			&amp;F(0)=0 \\
+			&amp;F(3)=7
+		\end{aligned}\right. \Rightarrow \left\{\begin{aligned}
+			&amp;C+1=0 \\
+			&amp;C+3m=8
+		\end{aligned}\right. \Leftrightarrow \left\{\begin{aligned}
+			&amp;C=-1 \\
+			&amp;m=3.
+		\end{aligned}\right. $</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 54:</b> Biết $F(x)$ là một nguyên hàm của hàm $f(x)=(x^2-6x+9)^{100}$ thỏa $F(3)=0$. Tập nghiệm của phương trình $F(x)=1$ có bao nhiêu phần tử?</div></div><div class="options"><label><input type="radio" name="P1_Cau_54" value="A"> <b>A.</b> $100$</label><label><input type="radio" name="P1_Cau_54" value="B"> <b>B.</b> $1$</label><label><input type="radio" name="P1_Cau_54" value="C"> <b>C.</b> $0$</label><label><input type="radio" name="P1_Cau_54" value="D"> <b>D.</b> $2$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $f(x)=(x^2-6x+9)^{100}=(x-3)^{200}$.<br> Khi đó $\left\{\begin{aligned}&amp;F(x)=\displaystyle\int f(x)\mathrm{\,d}x\\&amp;F(3)=0\end{aligned}\right. \Leftrightarrow \left\{\begin{aligned}&amp; F(x)=\dfrac{1}{201}(x-3)^{201}+C\\&amp; F(3)=0\end{aligned}\right.\Rightarrow F(x)=\dfrac{1}{201}(x-3)^{201}$ (do $C=0$).<br> Xét phương trình $F(x)=1 \Leftrightarrow \dfrac{1}{201}(x-3)^{201}=1 \Leftrightarrow (x-3)^{201}=201 \Leftrightarrow x=3+\sqrt[201]{201}.$</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 55:</b> $F(x)$ là một nguyên hàm của hàm $f(x)=\tan^2 x$ thỏa $F(0)=1$. Phương trình $F(x)+x=0$ có bao nhiêu nghiệm trên $(0;2020 \pi)$?</div></div><div class="options"><label><input type="radio" name="P1_Cau_55" value="A"> <b>A.</b> $2021$</label><label><input type="radio" name="P1_Cau_55" value="B"> <b>B.</b> $2020$</label><label><input type="radio" name="P1_Cau_55" value="C"> <b>C.</b> $2019$</label><label><input type="radio" name="P1_Cau_55" value="D"> <b>D.</b> $1010$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> <ul><li>[$\bullet$] Xét $\displaystyle\int f(x)\mathrm{\,d}x=\displaystyle\int \tan^2 x \mathrm{\,d}x=\displaystyle\int \left( \dfrac{1}{\cos^2 x}-1\right) \mathrm{\,d}x=\tan x -x +C$.<br> Với $F(0)=1 \Rightarrow \tan 0 - 0 +C=1 \Leftrightarrow C=1$. Vậy, $F(x)=\tan x - x +1$.</li><li>[$\bullet$] Xét phương trình $F(x)+x=0 \Leftrightarrow \tan x =-1 \Leftrightarrow x=-\dfrac{\pi}{4}+k \pi$, với $k \in \mathbb{Z}$.</li><li>[$\bullet$] $x \in (0;2020 \pi) \Rightarrow 0&lt;-\dfrac{\pi}{4}+k \pi&lt;2020 \pi \Leftrightarrow 0,25&lt;k&lt;2020,25$.<br> Mà $k \in \mathbb{Z} \Rightarrow k \in \{1;2;3;4,...,2020\}$. Vậy, có 2020 số $k$, tương ứng với 2020 nghiệm.</li></ul></div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 56:</b> Cho hàm số $f(x)$ thoả mãn $f'(x) = 2x - 3\mathrm e^x, \forall x \in \mathbb{R}$ và $f(0) = 5$. Khẳng định nào sau đây đúng?</div></div><div class="options"><label><input type="radio" name="P1_Cau_56" value="A"> <b>A.</b> $f(x) = x^2 + 3\mathrm e^x + 2$</label><label><input type="radio" name="P1_Cau_56" value="B"> <b>B.</b> $f(x) = 2x - 3\mathrm e^x + 8$</label><label><input type="radio" name="P1_Cau_56" value="C"> <b>C.</b> $f(x) = 2x + 3\mathrm e^x + 2$</label><label><input type="radio" name="P1_Cau_56" value="D"> <b>D.</b> $f(x) = x^2 - 3\mathrm e^x + 8$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $f(x) = \displaystyle \int f'(x) \mathrm{\,d} x = \int(2x - 3\mathrm e^x) \mathrm{\,d} x = x^2 - 3\mathrm e^x + C$.<br> Biết rằng $f(0) = 0^2 - 3 \cdot \mathrm e^0 + C = 5$, suy ra $C = 8$.<br> Do đó $f(x) = x^2 - 3\mathrm e^x + 8$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 57:</b> Hàm số $F(x)$ là một nguyên hàm của hàm số $f(x) = 5x \sqrt{x}$ trên $(0; +\infty)$ và $F(1) = 5$. Giá trị của $F(4)$ bằng</div></div><div class="options"><label><input type="radio" name="P1_Cau_57" value="A"> <b>A.</b> $70$</label><label><input type="radio" name="P1_Cau_57" value="B"> <b>B.</b> $35$</label><label><input type="radio" name="P1_Cau_57" value="C"> <b>C.</b> $67$</label><label><input type="radio" name="P1_Cau_57" value="D"> <b>D.</b> $69$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle \int f(x) \mathrm{\,d} x = \int 5x \sqrt{x} \mathrm{\,d} x = \int 5x^{\tfrac{3}{2}} \mathrm{\,d} x = 5\cdot \dfrac{x^{\tfrac{5}{2}}}{\tfrac{5}{2}} + C = 2x^{\tfrac{5}{2}} + C$, suy ra $F(x) = 2x^{\tfrac{5}{2}} + C$. <br> Biết rằng $F(1) = 2 + C = 5$, suy ra $C = 3$.<br> Vậy $F(4) = 2 \cdot 4^{\tfrac{5}{2}} + 3 = 67$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 58:</b> Biết hàm số $F(x)$ là một nguyên hàm của hàm số $f(x) = 4^x$ và $F(1) = \dfrac{1}{\ln 2}$. Giá trị của $F\left(\dfrac{3}{2}\right) \cdot \ln 2$ bằng</div></div><div class="options"><label><input type="radio" name="P1_Cau_58" value="A"> <b>A.</b> $3$</label><label><input type="radio" name="P1_Cau_58" value="B"> <b>B.</b> $7$</label><label><input type="radio" name="P1_Cau_58" value="C"> <b>C.</b> $5$</label><label><input type="radio" name="P1_Cau_58" value="D"> <b>D.</b> $9$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle \int f(x) \mathrm{\,d} x = \int 4^x \mathrm{\,d} x = \dfrac{4^x}{\ln 4} + C = \dfrac{4^x}{2 \ln 2} + C$, suy ra $F(x) = \dfrac{4^x}{2 \ln 2} + C$.<br> Biết rằng $F(1) = \dfrac{2}{\ln 2} + C = \dfrac{1}{\ln 2}$, suy ra $C = -\dfrac{1}{\ln 2}$.<br> Do đó $F\left(\dfrac{3}{2}\right) = \dfrac{4^{\tfrac{3}{2}}}{2 \ln 2} - \dfrac{1}{\ln 2} = \dfrac{3}{\ln 2}$, suy ra $F\left(\dfrac{3}{2}\right) \cdot \ln 2 = 3$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 59:</b> Kí hiệu $F(x)$ là một nguyên hàm của hàm số $f(x)=\dfrac{1}{\mathrm{e}^x+1}$, biết $F(0)=-\ln 2$. Tìm tập nghiệm $S$ của phương trình $F(x)+\ln(\mathrm{e}^x+1)=3$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_59" value="A"> <b>A.</b> $S=\{-3;3\}$</label><label><input type="radio" name="P1_Cau_59" value="B"> <b>B.</b> $S=\{3\}$</label><label><input type="radio" name="P1_Cau_59" value="C"> <b>C.</b> $S=\varnothing$</label><label><input type="radio" name="P1_Cau_59" value="D"> <b>D.</b> $S=\{-3\}$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> $\displaystyle\int\dfrac{1}{\mathrm{e}^x+1}\mathrm{d}x=\displaystyle\int\mathrm{d}x-\displaystyle\int\dfrac{\mathrm{e}^x}{\mathrm{e}^x+1}\mathrm{d}x=x-\ln(\mathrm{e}^x+1)+C$<br> Vì $F(0)=-\ln 2\Leftrightarrow C=0\Rightarrow F(x)=x-\ln(\mathrm{e}^x+1)$<br> Xét phương trình $F(x)+\ln(\mathrm{e}^x+1)=3\Leftrightarrow x=3$.</div></div></div>
+<div class="question"><div class="question-text"><div class="tp"><b>Câu 60:</b> Gọi $F(x)$ là một nguyên hàm của hàm số $f(x)=\mathrm{e}^x$, thỏa mãn $F(0)=2020$. Tính giá trị biểu thức $T=F(0)+F(1)+\ldots+F(2018)+F(2019)$.</div></div><div class="options"><label><input type="radio" name="P1_Cau_60" value="A"> <b>A.</b> $T=\dfrac{\mathrm{e}^{2020}-1}{\mathrm{e}-1}+2019\cdot 2020$</label><label><input type="radio" name="P1_Cau_60" value="B"> <b>B.</b> $T=\dfrac{\mathrm{e}^{2019}-1}{\mathrm{e}-1}+2018\cdot 2019$</label><label><input type="radio" name="P1_Cau_60" value="C"> <b>C.</b> $T=\dfrac{\mathrm{e}^{2020}-1}{\mathrm{e}-1}+2020^2$</label><label><input type="radio" name="P1_Cau_60" value="D"> <b>D.</b> $T=\dfrac{\mathrm{e}^{2019}-1}{\mathrm{e}-1}+2019^2$</label></div><div class="solution-box"><div class="tp"><b>Lời giải chi tiết:</b> Ta có $\displaystyle\int f(x)\mathrm{d}x=\displaystyle\int e^x\mathrm{d}x=e^x+C$<br> $F(x)$ là một nguyên hàm của hàm số $f(x)=e^x$, ta có $F(x)=e^x+C$<br> Mà $F(0)=2020\Rightarrow C=2019\Rightarrow F(x)=e^x+2019$. $$\begin{aligned}
+			T&amp;=F(0)+F(1)+\ldots+F(2018)+F(2019)\\
+			&amp;=1+e+e^2+\ldots+e^{2018}+e^{2019}+2019\cdot 2020\\
+			&amp;=\dfrac{e^{2020}-1}{e-1}+2019\cdot 2020.
+		\end{aligned}$$</div></div></div>
+        <button type="button" class="submit-btn" id="submitBtn" onclick="submitQuiz()">Nộp Bài</button>
+        <button type="button" class="submit-btn" id="viewSolBtn" onclick="showPasswordPrompt()" style="background: #17a2b8;">Xem Đáp Án & Lời Giải</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <div id="passwordPrompt">
+        <h4>Mở Khóa Lời Giải</h4>
+        <p style="color: #856404; font-size: 14px; margin-top: 0;">Nhập mật khẩu từ Giáo viên để xem đáp án chi tiết.</p>
+        <input type="password" id="solPassword" placeholder="Nhập mật khẩu...">
+        <button type="button" onclick="checkPassword()">Xem</button>
+    </div>
+
+    <footer class="author-footer"></footer>
+
+    <script>
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        if ((ua.indexOf("FBAN") === -1) && (ua.indexOf("FBAV") === -1) && (ua.indexOf("Zalo") === -1)) {
+            document.getElementById("zaloWarning").style.display = "none";
+        }
+
+        const GAS_URL = ""; 
+        const correctAnswers = {"P1_Cau_1": "A", "P1_Cau_2": "A", "P1_Cau_3": "B", "P1_Cau_4": "D", "P1_Cau_5": "A", "P1_Cau_6": "C", "P1_Cau_7": "C", "P1_Cau_8": "B", "P1_Cau_9": "A", "P1_Cau_10": "C", "P1_Cau_11": "C", "P1_Cau_12": "D", "P1_Cau_13": "D", "P1_Cau_14": "C", "P1_Cau_15": "A", "P1_Cau_16": "A", "P1_Cau_17": "A", "P1_Cau_18": "A", "P1_Cau_19": "D", "P1_Cau_20": "A", "P1_Cau_21": "A", "P1_Cau_22": "B", "P1_Cau_23": "C", "P1_Cau_24": "C", "P1_Cau_25": "D", "P1_Cau_26": "C", "P1_Cau_27": "C", "P1_Cau_28": "A", "P1_Cau_29": "B", "P1_Cau_30": "A", "P1_Cau_31": "C", "P1_Cau_32": "A", "P1_Cau_33": "B", "P1_Cau_34": "D", "P1_Cau_35": "C", "P1_Cau_36": "B", "P1_Cau_37": "C", "P1_Cau_38": "A", "P1_Cau_39": "C", "P1_Cau_40": "B", "P1_Cau_41": "A", "P1_Cau_42": "D", "P1_Cau_43": "B", "P1_Cau_44": "C", "P1_Cau_45": "B", "P1_Cau_46": "D", "P1_Cau_47": "D", "P1_Cau_48": "D", "P1_Cau_49": "D", "P1_Cau_50": "C", "P1_Cau_51": "B", "P1_Cau_52": "A", "P1_Cau_53": "B", "P1_Cau_54": "B", "P1_Cau_55": "B", "P1_Cau_56": "D", "P1_Cau_57": "C", "P1_Cau_58": "A", "P1_Cau_59": "B", "P1_Cau_60": "A"};
+        let isSubmitted = false;
+        
+        function moveNext(current, nextId) {
+            if (current.value.length > 1) current.value = current.value.slice(0, 1);
+            if (current.value.length === 1 && nextId) document.getElementById(nextId).focus();
+        }
+        function movePrev(e, current, prevId) {
+            if (e.key === "Backspace" && current.value === "" && prevId) document.getElementById(prevId).focus();
+        }
+
+        // =====================================================================
+        // LƯU TRẠNG THÁI (tải lại trang không mất bài, không reset đồng hồ)
+        // Thêm ?reset=1 vào đường dẫn để xóa trạng thái khi giáo viên muốn thử lại.
+        // =====================================================================
+        function hashStr(str) { let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0).toString(36); }
+        const STORE_KEY = 'quizstate:v2:' + location.pathname + '|' + document.title + '|' + hashStr(JSON.stringify(correctAnswers) + '|' + 90);
+        if (/[?&]reset=1(&|$)/.test(location.search)) { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+
+        function loadState() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || 'null'); } catch (e) { return null; } }
+        let state = loadState() || {};
+        function saveState(patch) {
+            Object.assign(state, patch);
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}   // bị chặn lưu (chế độ riêng tư...) thì chạy bằng bộ nhớ tạm
+        }
+        function newId() { return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)); }
+
+        const DURATION_MS = 90 * 60 * 1000;
+        if (!state.endTime) saveState({ endTime: Date.now() + DURATION_MS });
+        if (!state.attemptId) saveState({ attemptId: newId() });
+
+        function formFields() { return Array.from(document.querySelectorAll('#studentName, #studentClass, #quizForm input, #quizForm textarea')); }
+        function collectAnswers() { return formFields().map(el => (el.type === 'radio' || el.type === 'checkbox') ? (el.checked ? 1 : 0) : el.value); }
+        function restoreAnswers(arr) {
+            const f = formFields();
+            if (!Array.isArray(arr) || arr.length !== f.length) return;
+            f.forEach((el, i) => { if (el.type === 'radio' || el.type === 'checkbox') el.checked = !!arr[i]; else el.value = arr[i]; });
+        }
+
+        let saveTimer;
+        function scheduleSave() {
+            if (isSubmitted) return;
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => saveState({ answers: collectAnswers() }), 250);
+        }
+        document.addEventListener('input', scheduleSave);
+        document.addEventListener('change', scheduleSave);
+        window.addEventListener('pagehide', () => { if (!isSubmitted) saveState({ answers: collectAnswers() }); });
+
+        const resDiv = document.getElementById('result');
+        function showResult(html) { resDiv.style.display = 'block'; resDiv.innerHTML = html; }
+        function lockForm() {
+            document.getElementById('submitBtn').style.display = 'none';
+            document.querySelectorAll('#quizForm input, #quizForm textarea, #studentName, #studentClass').forEach(el => el.disabled = true);
+        }
+        const scoreSpan = s => `<span style="font-size: 24px; color: red;">${s}</span>`;
+
+        // Gửi kết quả; mất mạng thì giữ lại và tự gửi lại (khi có mạng, hoặc mỗi 15 giây)
+        let sending = false;
+        function sendPayload() {
+            const finalScoreString = state.finalScore;
+            if (!GAS_URL) {
+                saveState({ sent: true });
+                showResult(`Đã chấm xong (chưa cấu hình nơi nhận kết quả).<br>Điểm của bạn: ${scoreSpan(finalScoreString)}`);
+                return;
+            }
+            if (sending) return;
+            sending = true;
+            fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                keepalive: true,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(state.payload)
+            }).then(() => {
+                sending = false;
+                saveState({ sent: true });
+                showResult(`Nộp bài thành công!<br>Điểm của bạn: ${scoreSpan(finalScoreString)}`);
+            }).catch(() => {
+                sending = false;
+                showResult(`Đã chấm xong nhưng <b>chưa gửi được</b> kết quả (mạng yếu).<br>Em hãy giữ nguyên trang này, bài sẽ tự gửi lại khi có mạng.<br>Điểm của bạn: ${scoreSpan(finalScoreString)}`);
+            });
+        }
+        function retryPending() { if (state.submitted && !state.sent) sendPayload(); }
+        window.addEventListener('online', retryPending);
+        setInterval(retryPending, 15000);
+
+        // Đồng hồ tính theo giờ kết thúc nên không lệch khi tab ở nền hoặc điện thoại khóa màn hình
+        const timerEl = document.getElementById("timer");
+        let timeoutFired = false;
+        const countdown = setInterval(tick, 500);
+        document.addEventListener('visibilitychange', tick);
+        function tick() {
+            if (isSubmitted) { clearInterval(countdown); return; }
+            const remain = Math.ceil((state.endTime - Date.now()) / 1000);
+            if (remain <= 0) {
+                if (timeoutFired) return;
+                timeoutFired = true;
+                clearInterval(countdown);
+                timerEl.innerHTML = "HẾT GIỜ!";
+                alert("Đã hết thời gian làm bài. Hệ thống tự động nộp bài!");
+                submitQuiz(true);
+            } else {
+                const m = Math.floor(remain / 60), s = remain % 60;
+                timerEl.innerHTML = m.toString().padStart(2, '0') + ":" + s.toString().padStart(2, '0');
+            }
+        }
+
+        // Khôi phục khi mở lại trang
+        restoreAnswers(state.answers);
+        if (state.submitted) {
+            isSubmitted = true;
+            lockForm();
+            timerEl.innerHTML = "ĐÃ NỘP BÀI";
+            if (state.sent) showResult(`Nộp bài thành công!<br>Điểm của bạn: ${scoreSpan(state.finalScore)}`);
+            else { showResult('Đang gửi lại kết quả...'); retryPending(); }
+        } else {
+            tick();
+        }
+
+        function submitQuiz(autoSubmit = false) {
+            if (isSubmitted) return;
+            const name = document.getElementById('studentName').value.trim();
+            const className = document.getElementById('studentClass').value.trim();
+            
+            if (!autoSubmit && (!name || !className)) {
+                alert("Vui lòng nhập đầy đủ Họ tên và Lớp trước khi nộp!");
+                return;
+            }
+
+            isSubmitted = true;
+            if (typeof timerEl !== 'undefined' && timerEl) {
+                timerEl.innerHTML = "ĐÃ NỘP BÀI";
+            }
+            
+            const form = document.getElementById('quizForm');
+            let score = 0;
+            
+            let payload = {
+                'name': name || "Vô danh (Hết giờ)",
+                'className': className || "N/A"
+            };
+
+            for (let i = 1; i <= 60; i++) {
+                const qName = `P1_Cau_${i}`;
+                const selected = form.querySelector(`input[name="${qName}"]:checked`);
+                let ans = selected ? selected.value : "K";
+                const correctVal = correctAnswers[qName];
+                
+                let isCorrect = (selected && selected.value === correctVal);
+                if (isCorrect) score += 0.25;
+                
+                let statusStr = isCorrect ? "Đúng" : (selected ? "Sai" : "K");
+                payload[qName] = `${ans} (${statusStr})`;
+            }
+
+            const labels_tf = ['a', 'b', 'c', 'd'];
+            for (let i = 1; i <= 0; i++) {
+                let correctCount = 0;
+                let questionDetail = [];
+                
+                labels_tf.forEach(l => {
+                    const qName = `P2_Cau_${i}_${l}`;
+                    if (correctAnswers[qName]) {
+                        const selected = form.querySelector(`input[name="${qName}"]:checked`);
+                        let ans = selected ? selected.value : "K";
+                        const correctVal = correctAnswers[qName];
+                        let isSubCorrect = (selected && selected.value === correctVal);
+                        if (isSubCorrect) correctCount++;
+                        
+                        let subStatus = isSubCorrect ? "Đ" : (selected ? "S" : "-");
+                        questionDetail.push(`${l}:${ans}(${subStatus})`);
+                    }
+                });
+                
+                let p2ScoreEarned = 0;
+                if (correctCount === 1) p2ScoreEarned = 0.1;
+                else if (correctCount === 2) p2ScoreEarned = 0.25;
+                else if (correctCount === 3) p2ScoreEarned = 0.5;
+                else if (correctCount === 4) p2ScoreEarned = 1.0;
+                
+                score += p2ScoreEarned;
+                payload[`P2_Cau_${i}`] = `[${correctCount} ý đúng] ${questionDetail.join(' ')}`;
+            }
+
+            for (let i = 1; i <= 0; i++) {
+                const qName = `P3_Cau_${i}`;
+                if (correctAnswers[qName]) {
+                    let ans = "";
+                    for (let j = 1; j <= 12; j++) {
+                        const box = document.getElementById(`${qName}_${j}`);
+                        if (box && box.value) ans += box.value;
+                    }
+                    
+                    let studentAns = ans.replace(/,/g, '.').replace(/\s+/g, '');
+                    let trueAns = correctAnswers[qName].replace(/,/g, '.').replace(/\s+/g, '');
+                    let isCorrect = (studentAns === trueAns && studentAns !== "");
+                    
+                    if (isCorrect) score += 0.5;
+                    
+                    let statusStr = isCorrect ? "Đúng" : (studentAns !== "" ? "Sai" : "K");
+                    payload[qName] = `${studentAns || 'Bỏ trống'} (${statusStr})`;
+                }
+            }
+
+            const finalScoreString = `${score.toFixed(2)}/15`;
+            payload['score'] = score.toFixed(2);
+            payload['maxScore'] = '15';
+            payload['attemptId'] = state.attemptId;   // để Apps Script bỏ các lần gửi trùng
+
+            lockForm();
+            saveState({ answers: collectAnswers(), submitted: true, sent: false, payload: payload, finalScore: finalScoreString });
+            showResult('Đã chấm xong, đang gửi kết quả...');
+            sendPayload();
+        }
+
+        function showPasswordPrompt() {
+            document.getElementById('passwordPrompt').style.display = 'block';
+            document.getElementById('viewSolBtn').style.display = 'none';
+            document.getElementById('passwordPrompt').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function checkPassword() {
+            const entered = document.getElementById('solPassword').value;
+            if (entered === "122k9") {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                revealSolutions();
+            } else {
+                alert("Mật khẩu không chính xác! Vui lòng liên hệ Giáo viên.");
+            }
+        }
+
+        function revealSolutions() {
+            isSubmitted = true;
+            
+            document.getElementById('submitBtn').style.display = 'none';
+            const allInputs = document.querySelectorAll('#quizForm input, #quizForm textarea');
+            allInputs.forEach(input => input.disabled = true);
+
+            const form = document.getElementById('quizForm');
+            
+            for (let i = 1; i <= 60; i++) {
+                const qName = `P1_Cau_${i}`;
+                const correctVal = correctAnswers[qName];
+                const allRadios = form.querySelectorAll(`input[name="${qName}"]`);
+                allRadios.forEach(radio => {
+                    const lbl = radio.closest('label');
+                    if (radio.value === correctVal) {
+                        lbl.style.backgroundColor = '#d4edda';
+                        lbl.style.borderColor = '#28a745';
+                    } else if (radio.checked) {
+                        lbl.style.backgroundColor = '#f8d7da';
+                        lbl.style.borderColor = '#dc3545';
+                    } else {
+                        lbl.style.opacity = '0.5';
+                    }
+                });
+            }
+
+            const labels_tf = ['a', 'b', 'c', 'd'];
+            for (let i = 1; i <= 0; i++) {
+                labels_tf.forEach(l => {
+                    const qName = `P2_Cau_${i}_${l}`;
+                    if (correctAnswers[qName]) {
+                        const correctVal = correctAnswers[qName];
+                        const allRadios = form.querySelectorAll(`input[name="${qName}"]`);
+                        allRadios.forEach(radio => {
+                            const lbl = radio.closest('label');
+                            if (radio.value === correctVal) {
+                                lbl.style.backgroundColor = '#d4edda';
+                                lbl.style.color = '#155724';
+                            } else if (radio.checked) {
+                                lbl.style.backgroundColor = '#f8d7da';
+                                lbl.style.color = '#721c24';
+                            } else {
+                                lbl.style.opacity = '0.5';
+                            }
+                        });
+                    }
+                });
+            }
+
+            for (let i = 1; i <= 0; i++) {
+                const qName = `P3_Cau_${i}`;
+                if (correctAnswers[qName]) {
+                    let ans = "";
+                    let boxes = [];
+                    for (let j = 1; j <= 12; j++) {
+                        const box = document.getElementById(`${qName}_${j}`);
+                        if (box) {
+                            boxes.push(box);
+                            if (box.value) ans += box.value;
+                        }
+                    }
+                    
+                    let studentAns = ans.replace(/,/g, '.').replace(/\s+/g, '');
+                    let trueAns = correctAnswers[qName].replace(/,/g, '.').replace(/\s+/g, '');
+                    let isCorrect = (studentAns === trueAns && studentAns !== "");
+                    
+                    boxes.forEach(box => {
+                        if (isCorrect) {
+                            box.style.backgroundColor = '#d4edda';
+                            box.style.borderColor = '#28a745';
+                            box.style.color = '#155724';
+                        } else {
+                            box.style.backgroundColor = '#f8d7da';
+                            box.style.borderColor = '#dc3545';
+                            box.style.color = '#721c24';
+                        }
+                    });
+
+                    const group = document.querySelector(`#${qName}_1`).closest('.options');
+                    let correctDiv = document.createElement('div');
+                    correctDiv.style.marginTop = '10px';
+                    correctDiv.innerHTML = `<span style="color:#28a745; font-weight:bold; font-size:16px;">Đáp án đúng: ${correctAnswers[qName]}</span>`;
+                    group.appendChild(correctDiv);
+                }
+            }
+
+            const solutions = document.querySelectorAll('.solution-box');
+            solutions.forEach(box => box.style.display = 'block');
+
+            // Chuẩn hóa lại SVG vừa hiện ra (lúc này mới đo được kích thước)
+            initMedia();
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise().then(initMedia);
+        }
+
+        const MEDIA_SCOPE = '.question, .solution-box';
+        // =====================================================================
+        // XỬ LÝ SVG / ẢNH (dùng chung cho quiz và trình chiếu)
+        // Mỗi template khai báo trước: const MEDIA_SCOPE = '.vung-chua-hinh, ...';
+        // =====================================================================
+        const MEDIA_SVG_SEL = MEDIA_SCOPE.split(',').map(s => s.trim() + ' svg').join(', ');
+        const MEDIA_ALL_SEL = MEDIA_SCOPE.split(',').map(s => s.trim()).flatMap(s => [s + ' svg', s + ' img']).join(', ');
+
+        // Chỉ nhận số thuần hoặc "px"; "10cm", "50%", "auto"... trả về NaN để không đọc sai đơn vị
+        function svgNum(v) {
+            if (v == null) return NaN;
+            const m = String(v).trim().match(/^([0-9]*\.?[0-9]+)(px)?$/i);
+            return m ? parseFloat(m[1]) : NaN;
+        }
+
+        // Đổi id trong từng SVG thành duy nhất để các hình không dùng nhầm clipPath/marker/gradient của nhau
+        let __svgSeq = 0;
+        function uniquifySvgIds(svg) {
+            if (svg.dataset.idsDone) return;
+            svg.dataset.idsDone = '1';
+            const withId = svg.querySelectorAll('[id]');
+            if (!withId.length) return;
+            const prefix = 'svg' + (++__svgSeq) + '_';
+            const map = {};
+            withId.forEach(n => { map[n.id] = prefix + n.id; });
+            const ids = Object.keys(map);
+            const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const urlRe = /url\(\s*(['"]?)#([^)'"\s]+)\1\s*\)/g;
+            const fixUrls = str => str.replace(urlRe, (m, q, id) => map[id] ? `url(${q}#${map[id]}${q})` : m);
+
+            svg.querySelectorAll('*').forEach(n => {
+                if (n.tagName.toLowerCase() === 'style') {
+                    let css = fixUrls(n.textContent);
+                    css = css.replace(new RegExp('#(' + ids.map(esc).join('|') + ')(?![\\w-])', 'g'), '#' + prefix + '$1');
+                    n.textContent = css;
+                    return;
+                }
+                Array.from(n.attributes).forEach(a => {
+                    if (a.name === 'id' || a.value.indexOf('#') < 0) return;
+                    if ((a.name === 'href' || a.name === 'xlink:href') && a.value.charAt(0) === '#') {
+                        const id = a.value.slice(1);
+                        if (map[id]) n.setAttribute(a.name, '#' + map[id]);
+                    } else {
+                        const nv = fixUrls(a.value);
+                        if (nv !== a.value) n.setAttribute(a.name, nv);
+                    }
+                });
+            });
+            withId.forEach(n => { n.id = map[n.id]; });
+        }
+
+        // Chuẩn hóa SVG: id duy nhất + thêm viewBox nếu thiếu để SVG co giãn đúng
+        function normalizeSvgs() {
+            document.querySelectorAll(MEDIA_SVG_SEL).forEach(svg => {
+                if (svg.closest('mjx-container')) return;
+                uniquifySvgIds(svg);
+                if (svg.dataset.normalized) return;
+                const w = svgNum(svg.getAttribute('width'));
+                const h = svgNum(svg.getAttribute('height'));
+
+                if (!svg.hasAttribute('viewBox')) {
+                    if (w > 0 && h > 0) {
+                        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                    } else {
+                        try {   // đang bị ẩn thì getBBox lỗi -> sẽ thử lại khi phần chứa nó hiện ra
+                            const b = svg.getBBox();
+                            if (b.width && b.height)
+                                svg.setAttribute('viewBox', `${b.x - 2} ${b.y - 2} ${b.width + 4} ${b.height + 4}`);
+                        } catch (e) { return; }
+                    }
+                }
+                if (svg.hasAttribute('viewBox')) {
+                    if (w > 0) { svg.style.width = '100%'; svg.style.maxWidth = w + 'px'; }  // kích thước gốc làm trần
+                    svg.removeAttribute('height');
+                    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    svg.dataset.normalized = '1';
+                }
+            });
+        }
+
+        // Zoom: phóng to bằng cách tăng chiều rộng thật, khung tự cao theo, cuộn bằng thanh cuộn gốc
+        const __zoomRefresh = new Set();
+        let __zoomResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(__zoomResizeTimer);
+            __zoomResizeTimer = setTimeout(() => __zoomRefresh.forEach(fn => fn()), 150);
+        });
+
+        function setupImageZoom() {
+            document.querySelectorAll(MEDIA_ALL_SEL).forEach(el => {
+                if (el.closest('.zoom-container') || el.closest('mjx-container') || el.classList.contains('no-zoom')) return;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'zoom-container';
+                const viewport = document.createElement('div');
+                viewport.className = 'zoom-viewport';
+                el.parentNode.insertBefore(wrapper, el);
+                viewport.appendChild(el);
+                wrapper.appendChild(viewport);
+                el.classList.add('zoom-media');
+
+                let scale = 1;
+                const STEP = 0.25, MIN = 1, MAX = 4;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'zoom-toolbar';
+                const mk = (txt, title) => {
+                    const b = document.createElement('button');
+                    b.type = 'button'; b.className = 'zoom-btn'; b.innerHTML = txt; b.title = title;
+                    b.setAttribute('aria-label', title);
+                    return b;
+                };
+                const btnIn = mk('➕', 'Phóng to'), btnOut = mk('➖', 'Thu nhỏ'), btnReset = mk('↺', 'Mặc định');
+
+                function apply(newScale) {
+                    const cx = viewport.scrollWidth ? (viewport.scrollLeft + viewport.clientWidth / 2) / viewport.scrollWidth : 0.5;
+                    const cy = viewport.scrollHeight ? (viewport.scrollTop + viewport.clientHeight / 2) / viewport.scrollHeight : 0.5;
+
+                    scale = Math.min(MAX, Math.max(MIN, Math.round(newScale * 100) / 100));
+
+                    el.classList.remove('zoomed');
+                    el.style.removeProperty('--zw');
+                    const base = el.getBoundingClientRect().width;   // chiều rộng vừa khung hiện tại
+                    if (scale > 1 && base > 0) {
+                        el.style.setProperty('--zw', (base * scale) + 'px');
+                        el.classList.add('zoomed');
+                        viewport.scrollLeft = cx * viewport.scrollWidth - viewport.clientWidth / 2;
+                        viewport.scrollTop = cy * viewport.scrollHeight - viewport.clientHeight / 2;
+                    }
+                    viewport.classList.toggle('can-pan', el.classList.contains('zoomed'));
+                    btnIn.disabled = scale >= MAX;
+                    btnOut.disabled = scale <= MIN;
+                }
+
+                btnIn.onclick = () => apply(scale + STEP);
+                btnOut.onclick = () => apply(scale - STEP);
+                btnReset.onclick = () => apply(1);
+                __zoomRefresh.add(() => { if (scale > 1) apply(scale); });
+
+                // Ctrl + lăn chuột để zoom, nhấp đúp để phóng to/reset
+                viewport.addEventListener('wheel', e => {
+                    if (!e.ctrlKey) return;
+                    e.preventDefault();
+                    apply(scale + (e.deltaY < 0 ? STEP : -STEP));
+                }, { passive: false });
+                viewport.addEventListener('dblclick', () => apply(scale > 1 ? 1 : 2));
+
+                // Kéo thả bằng chuột (cảm ứng dùng cuộn gốc của trình duyệt)
+                let dragging = false, sx = 0, sy = 0, sl = 0, st = 0;
+                viewport.addEventListener('pointerdown', e => {
+                    if (e.pointerType !== 'mouse' || !el.classList.contains('zoomed')) return;
+                    dragging = true; sx = e.clientX; sy = e.clientY; sl = viewport.scrollLeft; st = viewport.scrollTop;
+                    viewport.setPointerCapture(e.pointerId);
+                    viewport.classList.add('dragging');
+                });
+                viewport.addEventListener('pointermove', e => {
+                    if (!dragging) return;
+                    viewport.scrollLeft = sl - (e.clientX - sx);
+                    viewport.scrollTop = st - (e.clientY - sy);
+                });
+                const stop = () => { dragging = false; viewport.classList.remove('dragging'); };
+                viewport.addEventListener('pointerup', stop);
+                viewport.addEventListener('pointercancel', stop);
+
+                toolbar.append(btnIn, btnOut, btnReset);
+                wrapper.appendChild(toolbar);
+                apply(1);
+            });
+        }
+
+        // Bọc từng <table> trong khung cuộn ngang (bỏ qua bảng của MathJax hoặc bảng đã được bọc)
+        const MEDIA_TABLE_SEL = MEDIA_SCOPE.split(',').map(s => s.trim() + ' table').join(', ');
+        function wrapTables() {
+            document.querySelectorAll(MEDIA_TABLE_SEL).forEach(t => {
+                if (t.closest('mjx-container, .table-scroll, .table-responsive, #tblOverlay')) return;
+                if (!t.parentNode) return;
+                const w = document.createElement('div');
+                w.className = 'table-scroll';
+                t.parentNode.insertBefore(w, t);
+                w.appendChild(t);
+            });
+        }
+
+        // ---- Bảng rộng: gợi ý vuốt ngang, cột đầu cố định, nút xem toàn màn hình ----
+        const __tblRefresh = [];
+        window.addEventListener('resize', () => __tblRefresh.forEach(fn => fn()));
+        function tblState(box, sc) {
+            const over = sc.scrollWidth > sc.clientWidth + 2;
+            box.classList.toggle('has-scroll', over);
+            box.classList.toggle('at-end', !over || sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 2);
+        }
+        function enhanceTables() {
+            document.querySelectorAll('.table-responsive, .table-scroll').forEach(sc => {
+                if (sc.dataset.tblDone || sc.closest('#tblOverlay')) return;
+                const table = sc.querySelector('table');
+                if (!table || !sc.parentNode) return;
+                sc.dataset.tblDone = '1';
+                const box = document.createElement('div'); box.className = 'tbl-box';
+                const hint = document.createElement('div'); hint.className = 'tbl-hint';
+                const msg = document.createElement('span'); msg.textContent = '\u2194 Vuốt ngang để xem thêm';
+                const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'tbl-open'; btn.textContent = '\u26F6 Xem toàn màn hình';
+                btn.addEventListener('click', e => { e.stopPropagation(); openTableOverlay(table); });
+                hint.append(msg, btn);
+                const wrap = document.createElement('div'); wrap.className = 'tbl-wrap';
+                const fade = document.createElement('div'); fade.className = 'tbl-fade';
+                sc.parentNode.insertBefore(box, sc);
+                box.append(hint, wrap);
+                wrap.append(sc, fade);
+                const first = table.rows[0];
+                if (first && first.cells.length >= 4 && first.cells[0].colSpan === 1 && first.cells[0].rowSpan === 1) table.classList.add('sticky-first');
+                const upd = () => tblState(box, sc);
+                sc.addEventListener('scroll', upd, { passive: true });
+                if (window.ResizeObserver) new ResizeObserver(upd).observe(table);
+                __tblRefresh.push(upd);
+                upd();
+            });
+        }
+        let tblOv = null, tblScale = 1;
+        function closeTableOverlay() {
+            if (!tblOv) return;
+            tblOv.classList.remove('open');
+            document.documentElement.style.overflow = '';
+        }
+        function openTableOverlay(table) {
+            if (!tblOv) {
+                tblOv = document.createElement('div'); tblOv.id = 'tblOverlay';
+                tblOv.innerHTML = '<div class="tbl-ov-bar"><span class="ttl">Kéo để xem; A+ / A\u2212 đổi cỡ chữ</span>'
+                    + '<button type="button" class="zoom-btn" data-a="-">A\u2212</button><button type="button" class="zoom-btn" data-a="+">A+</button>'
+                    + '<button type="button" class="zoom-btn" data-a="x">\u2715 Đóng</button></div><div class="tbl-ov-body"></div>';
+                document.body.appendChild(tblOv);
+                tblOv.addEventListener('click', e => {
+                    const b = e.target.closest('button[data-a]');
+                    if (!b) return;
+                    if (b.dataset.a === 'x') { closeTableOverlay(); return; }
+                    tblScale = Math.min(2.6, Math.max(0.6, tblScale + (b.dataset.a === '+' ? 0.2 : -0.2)));
+                    tblOv.style.setProperty('--tbl-s', tblScale);
+                });
+                window.addEventListener('keydown', e => {                 // đang xem bảng: không để phím chuyển câu / slide
+                    if (!tblOv.classList.contains('open')) return;
+                    e.stopImmediatePropagation();
+                    if (e.key === 'Escape') closeTableOverlay();
+                }, true);
+            }
+            const body = tblOv.querySelector('.tbl-ov-body');
+            body.innerHTML = '';
+            const c = table.cloneNode(true);
+            c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+            c.classList.remove('sticky-first');
+            body.appendChild(c);
+            tblScale = 1;
+            tblOv.style.setProperty('--tbl-s', 1);
+            tblOv.classList.add('open');
+            document.documentElement.style.overflow = 'hidden';
+            body.scrollTo(0, 0);
+        }
+
+        function initMedia() { wrapTables(); enhanceTables(); normalizeSvgs(); setupImageZoom(); }
+
+        window.addEventListener('load', () => setTimeout(initMedia, 300));
+
+    </script>
+</body>
+</html>
